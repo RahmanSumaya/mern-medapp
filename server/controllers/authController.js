@@ -46,7 +46,7 @@ exports.login = async (req, res) => { // Removed 'next'
       process.env.JWT_SECRET,
       { expiresIn: '1d' }
     );
-
+  
     return res.json({
       token,
       user: {
@@ -80,34 +80,36 @@ exports.getMe = async (req, res) => { // Removed 'next'
 };
 
 // 4. UPDATE PROFILE
-exports.updateProfile = async (req, res) => { // Removed 'next'
+exports.updateProfile = async (req, res) => {
   try {
-    const { name, phone, address, gender, dob } = req.body;
+    const { name, phone, address, gender, dob, profilePic } = req.body;
 
-    const user = await User.findById(req.user.id);
-    if (!user) return res.status(404).json({ msg: "User not found" });
+    // Use findByIdAndUpdate to bypass the 'pre-save' hook issues
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      { 
+        $set: { name, phone, address, gender, dob, profilePic } 
+      },
+      { new: true, runValidators: true }
+    ).select('-password');
 
-    // Update fields
-    if (name) user.name = name;
-    if (phone) user.phone = phone;
-    if (address) user.address = address;
-    if (gender) user.gender = gender;
-    if (dob) user.dob = dob;
+    if (!updatedUser) {
+      return res.status(404).json({ msg: "User not found" });
+    }
 
-    await user.save();
-    
-    return res.json({
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      phone: user.phone,
-      address: user.address,
-      gender: user.gender,
-      dob: user.dob
-    });
+    return res.json(updatedUser);
   } catch (err) {
-    console.error(err.message);
-    return res.status(500).send('Server error');
+    console.error("Update Error:", err.message);
+    return res.status(500).json({ msg: "Server Error", error: err.message });
+  }
+};
+// controllers/authController.js
+exports.getDoctorProfile = async (req, res) => {
+  try {
+    const doctor = await User.findById(req.user.id).select('-password');
+    if (!doctor) return res.status(404).json({ msg: "Doctor not found" });
+    res.json(doctor);
+  } catch (err) {
+    res.status(500).send('Server Error in getDoctorProfile');
   }
 };

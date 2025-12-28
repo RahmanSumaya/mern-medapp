@@ -4,30 +4,33 @@ const User = require('../models/User');
 const { protect } = require('../middleware/authMiddleware');
 
 // @route   GET api/users/profile
-// @desc    Get current logged-in user's profile (Works for both User & Doctor)
 router.get('/profile', protect, async (req, res) => {
   try {
+    // Check if req.user exists from the protect middleware
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ msg: "User ID missing from token" });
+    }
+
     const user = await User.findById(req.user.id).select('-password');
-    res.json(user);
+    if (!user) return res.status(404).json({ msg: "User not found" });
+    
+    return res.json(user);
   } catch (err) {
-    res.status(500).send('Server Error');
+    console.error("Profile GET Error:", err.message);
+    return res.status(500).send('Server Error');
   }
 });
 
 // @route   PUT api/users/profile
-// @desc    Update profile (Name, Phone, Address, Profile Photo)
 router.put('/profile', protect, async (req, res) => {
   try {
     const { name, phone, address, profilePic, specialization, hourlyRate } = req.body;
 
-    // Build profile object
     const profileFields = {};
     if (name) profileFields.name = name;
     if (phone) profileFields.phone = phone;
     if (address) profileFields.address = address;
     if (profilePic) profileFields.profilePic = profilePic;
-    
-    // If the logged-in user is a doctor, they can also update these:
     if (specialization) profileFields.specialization = specialization;
     if (hourlyRate) profileFields.hourlyRate = hourlyRate;
 
@@ -37,10 +40,12 @@ router.put('/profile', protect, async (req, res) => {
       { new: true }
     ).select('-password');
 
-    res.json(user);
+    if (!user) return res.status(404).json({ msg: "User not found" });
+
+    return res.json(user);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
+    console.error("Profile PUT Error:", err.message);
+    return res.status(500).send('userroutes error');
   }
 });
 
