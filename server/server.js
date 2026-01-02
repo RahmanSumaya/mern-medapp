@@ -12,6 +12,7 @@ app.use(express.json());
 // 2. IMPORT ROUTERS
 const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const appointmentRoutes = require('./routes/appointmentRoutes');
 const articleRoutes = require('./routes/articleRoutes');
 const userRoutes = require('./routes/userRoutes'); // Added this
 // server.js
@@ -27,8 +28,12 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/articles', articleRoutes);
+app.use('/api/appointments', appointmentRoutes);
 app.use('/api/users', userRoutes); // Use the User routes here
-app.use('/api/chat', require('./routes/chatRoutes'));
+//app.use('/api/chat', require('./routes/chatRoutes'));
+app.use((req, res) => {
+    res.status(404).json({ message: `Route ${req.originalUrl} not found on this server.` });
+});
 // 4. DATABASE & START
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected"))

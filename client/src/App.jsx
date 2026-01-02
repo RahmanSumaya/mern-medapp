@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
 import Account from './pages/Account';
 import Signup from './pages/Signup';
@@ -7,25 +7,87 @@ import AdminDashboard from './pages/AdminDashboard';
 import HealthLibrary from './pages/HealthLibrary';
 import ArticleDetail from './pages/ArticleDetail';
 import AllDoctors from './pages/AllDoctors';
-import PatientDashboard from './pages/PatientDashboard'; // <--- ADD THIS LINE
-import DoctorDashboard from './pages/DoctorDashboard'; // <--- ADD THIS LINE
+import PatientDashboard from './pages/PatientDashboard'; 
+import DoctorDashboard from './pages/DoctorDashboard'; 
 import ChatBot from './pages/ChatBot';
+
+// --- PROTECTED ROUTE COMPONENT ---
+const ProtectedRoute = ({ children, allowedRole }) => {
+  const token = localStorage.getItem('token');
+  const userRole = localStorage.getItem('role'); // Get role saved during login
+
+  if (!token) {
+    return <Navigate to="/login" />;
+  }
+
+  // If a specific role is required and user doesn't have it, send them home
+  if (allowedRole && userRole !== allowedRole) {
+    return <Navigate to="/" />;
+  }
+
+  return children;
+};
 
 function App() {
   return (
     <Router>
       <Routes>
+        {/* Public Routes */}
         <Route path="/" element={<Home />} />
-        <Route path="/account" element={<Account />} />
-        <Route path="/all-doctors" element={<AllDoctors />} />
-        <Route path="/article/:id" element={<ArticleDetail />} />
-        <Route path="/dashboard_doctor" element={<DoctorDashboard />} />
-        <Route path="/dashboard" element={<PatientDashboard />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/library" element={<HealthLibrary />} />
         <Route path="/login" element={<Login />} /> 
-        <Route path="/aichatbot" element={<ChatBot/>}/>
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/library" element={<HealthLibrary />} />
+        <Route path="/article/:id" element={<ArticleDetail />} />
+        <Route path="/all-doctors" element={<AllDoctors />} />
+
+        {/* Patient Only Routes */}
+        <Route 
+          path="/dashboard" 
+          element={
+            <ProtectedRoute allowedRole="user">
+              <PatientDashboard />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/aichatbot" 
+          element={
+            <ProtectedRoute allowedRole="user">
+              <ChatBot />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/account" 
+          element={
+            <ProtectedRoute>
+              <Account />
+            </ProtectedRoute>
+          } 
+        />
+        
+        {/* Doctor Only Routes */}
+        <Route 
+          path="/dashboard_doctor" 
+          element={
+            <ProtectedRoute allowedRole="doctor">
+              <DoctorDashboard />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Admin Only Routes */}
+        <Route 
+          path="/admin-dashboard" 
+          element={
+            <ProtectedRoute allowedRole="admin">
+              <AdminDashboard />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
   );
