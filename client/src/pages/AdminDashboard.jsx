@@ -1,5 +1,8 @@
-// Add 'Calendar' to your lucide-react imports at the top
+// 1. ADD THESE IMPORTS (Missing in your snippet)
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { UserPlus, BookOpen, LogOut, LayoutDashboard, Calendar, CheckCircle } from 'lucide-react';
+
 const StatusBadge = ({ status }) => {
   const styles = {
     Pending: "bg-amber-100 text-amber-700 border-amber-200",
@@ -16,21 +19,24 @@ const StatusBadge = ({ status }) => {
   );
 };
 
-// Usage in your list:
-// <td><StatusBadge status={app.status} /></td>
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
-  // ... (keep your existing logout logic)
+
+  // Handle Logout (Simplified placeholder - ensure this matches your logic)
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    window.location.href = '/login';
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-50">
+      {/* Sidebar */}
       <div className="w-64 bg-slate-900 text-white flex flex-col">
         <div className="p-6 text-2xl font-bold border-b border-slate-800 text-indigo-400">MedConnect Admin</div>
         <nav className="flex-1 p-4 space-y-2">
           <button onClick={() => setActiveTab('overview')} className={`w-full flex items-center gap-3 p-3 rounded-lg ${activeTab === 'overview' ? 'bg-indigo-600' : 'hover:bg-slate-800'}`}>
             <LayoutDashboard size={20} /> Overview
           </button>
-          {/* NEW TAB FOR APPOINTMENTS */}
           <button onClick={() => setActiveTab('appointments')} className={`w-full flex items-center gap-3 p-3 rounded-lg ${activeTab === 'appointments' ? 'bg-indigo-600' : 'hover:bg-slate-800'}`}>
             <Calendar size={20} /> Appointments
           </button>
@@ -41,30 +47,38 @@ const AdminDashboard = () => {
             <BookOpen size={20} /> Create Article
           </button>
         </nav>
-        {/* ... (keep logout) */}
+        
+        <button onClick={handleLogout} className="p-4 flex items-center gap-3 hover:bg-rose-900 text-rose-300 transition-colors">
+          <LogOut size={20} /> Logout
+        </button>
       </div>
 
+      {/* Main Content */}
       <div className="flex-1 p-8 overflow-y-auto">
-        {activeTab === 'overview' && <OverviewStats />}
+        {activeTab === 'overview' && <div className="p-4">Overview Content (Replace with your Stats component)</div>}
         {activeTab === 'appointments' && <AdminAppointmentManager />}
-        {activeTab === 'doctor' && <AddDoctorForm />}
-        {activeTab === 'article' && <AddArticleForm />}
+        {activeTab === 'doctor' && <div className="p-4">Add Doctor Form (Replace with your Form component)</div>}
+        {activeTab === 'article' && <div className="p-4">Add Article Form (Replace with your Form component)</div>}
       </div>
     </div>
   );
 };
 
-// --- NEW SUB-COMPONENT: ADMIN APPOINTMENT MANAGER ---
+// --- SUB-COMPONENT: ADMIN APPOINTMENT MANAGER ---
 const AdminAppointmentManager = () => {
   const [appointments, setAppointments] = useState([]);
 
   useEffect(() => {
     const fetchAll = async () => {
-      const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/appointments/all', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setAppointments(res.data);
+      try {
+        const token = localStorage.getItem('token');
+        const res = await axios.get('http://localhost:5000/api/appointments/all', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setAppointments(res.data);
+      } catch (err) {
+        console.error("Error fetching appointments:", err);
+      }
     };
     fetchAll();
   }, []);
@@ -103,12 +117,7 @@ const AdminAppointmentManager = () => {
                 <td className="py-4">{app.doctor?.name}</td>
                 <td className="py-4 text-sm">{app.date} at {app.time}</td>
                 <td className="py-4">
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                    app.status === 'Paid' ? 'bg-blue-100 text-blue-600' : 
-                    app.status === 'Confirmed' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'
-                  }`}>
-                    {app.status}
-                  </span>
+                  <StatusBadge status={app.status} />
                 </td>
                 <td className="py-4">
                   {app.status === 'Paid' && (
@@ -128,3 +137,6 @@ const AdminAppointmentManager = () => {
     </div>
   );
 };
+
+// 2. ADD THIS EXPORT AT THE VERY BOTTOM
+export default AdminDashboard;
