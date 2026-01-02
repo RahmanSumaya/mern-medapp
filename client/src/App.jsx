@@ -9,7 +9,6 @@ import ArticleDetail from './pages/ArticleDetail';
 import AllDoctors from './pages/AllDoctors';
 import PatientDashboard from './pages/PatientDashboard'; 
 import DoctorDashboard from './pages/DoctorDashboard'; 
-// import ChatBot from './pages/ChatBot';
 
 // --- PROTECTED ROUTE COMPONENT ---
 const ProtectedRoute = ({ children, allowedRole }) => {
@@ -39,8 +38,7 @@ function App() {
         <Route path="/library" element={<HealthLibrary />} />
         <Route path="/article/:id" element={<ArticleDetail />} />
         <Route path="/all-doctors" element={<AllDoctors />} />
-        <Route path="/account" element={<Account />} />
-
+        <Route path="/account" element={<Account/>} />
 
         {/* Patient Only Routes */}
         <Route 

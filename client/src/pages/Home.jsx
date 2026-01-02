@@ -1,8 +1,16 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { UserCircle } from 'lucide-react'; // Make sure to have lucide-react installed
 
 const Home = () => {
   const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Check authentication status on component mount
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
+  }, []);
 
   // Categories for the dynamic buttons
   const specialties = [
@@ -27,12 +35,26 @@ const Home = () => {
           <button className="hover:text-blue-600">About Us</button>
         </div>
 
-        <button 
-          onClick={() => navigate('/login')}
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition shadow-lg shadow-blue-200"
-        >
-          Account
-        </button>
+        {/* AUTH SECTION */}
+        <div className="flex items-center">
+          {isLoggedIn ? (
+            <button 
+              onClick={() => navigate('/dashboard')}
+              className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors p-1"
+              title="Go to Dashboard"
+            >
+              <UserCircle size={35} strokeWidth={1.5} />
+              <span className="hidden sm:inline font-medium text-sm"></span>
+            </button>
+          ) : (
+            <button 
+              onClick={() => navigate('/account')}
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition shadow-lg shadow-blue-200"
+            >
+              Account
+            </button>
+          )}
+        </div>
       </nav>
 
       {/* HERO SECTION */}
@@ -53,16 +75,15 @@ const Home = () => {
 
         {/* Dynamic Specialty Buttons */}
         <div className="flex flex-wrap justify-center gap-3 mb-16">
-          {/* In Home.jsx */}
-{specialties.map((item) => (
-  <button 
-    key={item}
-    onClick={() => navigate(`/all-doctors?specialty=${item}`)} // Send the specialty in the URL
-    className="px-5 py-2 bg-white rounded-full text-slate-700 font-medium shadow-md hover:bg-blue-600 hover:text-white transition-all border border-blue-100"
-  >
-    {item}
-  </button>
-))}
+          {specialties.map((item) => (
+            <button 
+              key={item}
+              onClick={() => navigate(`/all-doctors?specialty=${item}`)} 
+              className="px-5 py-2 bg-white rounded-full text-slate-700 font-medium shadow-md hover:bg-blue-600 hover:text-white transition-all border border-blue-100"
+            >
+              {item}
+            </button>
+          ))}
         </div>
 
         {/* Bottom Image Box */}

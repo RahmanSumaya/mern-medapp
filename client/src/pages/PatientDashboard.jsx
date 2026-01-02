@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Added for logout redirection
 import axios from 'axios';
-import { User, Mail, Phone, MapPin, Calendar, Edit2, Check, X, Clock, Stethoscope } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Calendar, Edit2, Check, X, Clock, Stethoscope, LogOut } from 'lucide-react';
+
 const StatusBadge = ({ status }) => {
   const styles = {
     Pending: "bg-amber-100 text-amber-700 border-amber-200",
@@ -17,18 +19,13 @@ const StatusBadge = ({ status }) => {
   );
 };
 
-// Usage in your list:
-// <td><StatusBadge status={app.status} /></td>
 const PatientDashboard = () => {
+  const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(true);
-
-  // --- NEW STATES FOR APPOINTMENTS ---
-  const [doctors, setDoctors] = useState([]);
   const [appointments, setAppointments] = useState([]);
-  const [bookingData, setBookingData] = useState({ doctorId: '', date: '', time: '' });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,10 +37,6 @@ const PatientDashboard = () => {
         const profileRes = await axios.get('http://localhost:5000/api/auth/me', { headers });
         setUserData(profileRes.data);
         setFormData(profileRes.data);
-
-        // Fetch List of Doctors
-        const doctorsRes = await axios.get('http://localhost:5000/api/users/doctors', { headers });
-        setDoctors(doctorsRes.data);
 
         // Fetch Patient's Appointments
         const appointmentsRes = await axios.get('http://localhost:5000/api/appointments/my-appointments', { headers });
@@ -72,20 +65,9 @@ const PatientDashboard = () => {
     }
   };
 
-  // --- NEW HANDLER: BOOK APPOINTMENT ---
-  const handleBookAppointment = async (e) => {
-    e.preventDefault();
-    try {
-      const token = localStorage.getItem('token');
-      const res = await axios.post('http://localhost:5000/api/appointments/book', bookingData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      alert("Appointment Requested!");
-      setAppointments([...appointments, res.data.newAppointment]);
-      setBookingData({ doctorId: '', date: '', time: '' }); // Reset form
-    } catch (err) {
-      alert(err.response?.data?.message || "Booking failed");
-    }
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/'); // Redirect to home
   };
 
   if (loading) return <div className="p-20 text-center">Loading Dashboard...</div>;
@@ -111,18 +93,25 @@ const PatientDashboard = () => {
               <h1 className="text-2xl font-bold text-slate-900">{userData?.name}</h1>
               <p className="text-slate-500 uppercase text-xs font-bold tracking-widest">{userData?.role}</p>
             </div>
-            {!isEditing ? (
-              <button onClick={() => setIsEditing(true)} className="flex items-center gap-2 bg-slate-900 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-blue-600 transition">
-                <Edit2 size={16} /> Edit Profile
-              </button>
-            ) : (
-              <div className="flex gap-2">
-                <button onClick={() => setIsEditing(false)} className="p-2 text-slate-400 hover:text-red-500 transition"><X /></button>
-                <button onClick={handleUpdate} className="flex items-center gap-2 bg-green-600 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-green-700 transition">
-                  <Check size={16} /> Save Changes
-                </button>
-              </div>
-            )}
+            <div className="flex gap-3">
+              {!isEditing ? (
+                <>
+                  <button onClick={() => setIsEditing(true)} className="flex items-center gap-2 bg-slate-100 text-slate-700 px-5 py-2 rounded-xl text-sm font-bold hover:bg-slate-200 transition">
+                    <Edit2 size={16} /> Edit Profile
+                  </button>
+                  <button onClick={handleLogout} className="flex items-center gap-2 bg-rose-50 text-rose-600 px-5 py-2 rounded-xl text-sm font-bold hover:bg-rose-100 transition">
+                    <LogOut size={16} /> Logout
+                  </button>
+                </>
+              ) : (
+                <div className="flex gap-2">
+                  <button onClick={() => setIsEditing(false)} className="p-2 text-slate-400 hover:text-red-500 transition"><X /></button>
+                  <button onClick={handleUpdate} className="flex items-center gap-2 bg-green-600 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-green-700 transition">
+                    <Check size={16} /> Save Changes
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -146,82 +135,43 @@ const PatientDashboard = () => {
         </div>
       </div>
 
-      {/* SECTION 2: BOOKING FORM & HISTORY */}
-      <div className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* Book Appointment Form */}
-        <div className="lg:col-span-1 bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
-          <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-            <Calendar className="text-blue-600" size={20} /> Book New
-          </h2>
-          <form onSubmit={handleBookAppointment} className="space-y-4">
-            <div>
-              <label className="text-xs font-bold text-slate-400 uppercase">Select Doctor</label>
-              <select 
-                required
-                className="w-full p-3 bg-slate-50 border rounded-xl outline-none mt-1"
-                value={bookingData.doctorId}
-                onChange={(e) => setBookingData({...bookingData, doctorId: e.target.value})}
-              >
-                <option value="">Choose a Doctor</option>
-                {doctors.map(doc => (
-                  <option key={doc._id} value={doc._id}>{doc.name}</option>
-                ))}
-              </select>
+      {/* SECTION 2: APPOINTMENT STATUS LIST */}
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-slate-900">Appointment Status</h2>
+            <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
+              <Calendar size={20} />
             </div>
-            <div>
-              <label className="text-xs font-bold text-slate-400 uppercase">Date</label>
-              <input 
-                type="date" required className="w-full p-3 bg-slate-50 border rounded-xl outline-none mt-1"
-                value={bookingData.date}
-                onChange={(e) => setBookingData({...bookingData, date: e.target.value})}
-              />
-            </div>
-            <div>
-              <label className="text-xs font-bold text-slate-400 uppercase">Time</label>
-              <input 
-                type="time" required className="w-full p-3 bg-slate-50 border rounded-xl outline-none mt-1"
-                value={bookingData.time}
-                onChange={(e) => setBookingData({...bookingData, time: e.target.value})}
-              />
-            </div>
-            <button type="submit" className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition">
-              Request Appointment
-            </button>
-          </form>
-        </div>
-
-        {/* Appointment History List */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
-          <h2 className="text-lg font-bold text-slate-900 mb-4">Your Appointments</h2>
+          </div>
+          
           <div className="space-y-4">
             {appointments.length === 0 ? (
-              <p className="text-slate-400 text-sm">No appointments found.</p>
+              <div className="text-center py-10 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                <p className="text-slate-400 text-sm">You have no scheduled appointments.</p>
+              </div>
             ) : (
               appointments.map((app) => (
-                <div key={app._id} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                <div key={app._id} className="flex flex-col md:flex-row md:items-center justify-between p-5 bg-slate-50 rounded-2xl border border-slate-100 hover:border-blue-200 transition-colors">
                   <div className="flex items-center gap-4">
-                    <div className="p-3 bg-white rounded-xl text-blue-600 shadow-sm">
-                      <Stethoscope size={20} />
+                    <div className="p-3 bg-white rounded-xl text-blue-600 shadow-sm border border-slate-50">
+                      <Stethoscope size={24} />
                     </div>
                     <div>
-                      <p className="font-bold text-slate-800">{app.doctor?.name || 'Doctor'}</p>
-                      <div className="flex gap-3 text-xs text-slate-500">
-                        <span className="flex items-center gap-1"><Calendar size={12}/> {app.date}</span>
-                        <span className="flex items-center gap-1"><Clock size={12}/> {app.time}</span>
+                      <p className="font-bold text-lg text-slate-800">{app.doctor?.name || 'Doctor Name'}</p>
+                      <div className="flex gap-4 text-sm text-slate-500 mt-1">
+                        <span className="flex items-center gap-1"><Calendar size={14}/> {app.date}</span>
+                        <span className="flex items-center gap-1"><Clock size={14}/> {app.time}</span>
                       </div>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <span className={`text-[10px] font-bold uppercase px-3 py-1 rounded-full ${
-                      app.status === 'DoctorApproved' ? 'bg-green-100 text-green-600' :
-                      app.status === 'Pending' ? 'bg-yellow-100 text-yellow-600' : 
-                      'bg-blue-100 text-blue-600'
-                    }`}>
-                      {app.status}
-                    </span>
+                  
+                  <div className="mt-4 md:mt-0 flex flex-col items-end gap-2">
+                    <StatusBadge status={app.status} />
                     {app.status === 'DoctorApproved' && !app.isPaid && (
-                      <button className="block mt-2 text-xs font-bold text-blue-600 underline">Pay Now</button>
+                      <button className="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-700 transition">
+                        Proceed to Payment
+                      </button>
                     )}
                   </div>
                 </div>
@@ -229,7 +179,6 @@ const PatientDashboard = () => {
             )}
           </div>
         </div>
-
       </div>
     </div>
   );
