@@ -9,7 +9,7 @@ import ArticleDetail from './pages/ArticleDetail';
 import AllDoctors from './pages/AllDoctors';
 import PatientDashboard from './pages/PatientDashboard'; 
 import DoctorDashboard from './pages/DoctorDashboard'; 
-
+import Chatbot from './pages/Chatbot'; 
 // --- PROTECTED ROUTE COMPONENT ---
 const ProtectedRoute = ({ children, allowedRole }) => {
   const token = localStorage.getItem('token');
@@ -49,7 +49,14 @@ function App() {
             </ProtectedRoute>
           } 
         />
-        
+        <Route 
+          path="/chatwithai" 
+          element={
+            <ProtectedRoute allowedRole="user">
+              <Chatbot />
+            </ProtectedRoute>
+          } 
+        />
         {/* Doctor Only Routes */}
         <Route 
           path="/dashboard_doctor" 

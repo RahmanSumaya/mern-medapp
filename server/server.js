@@ -30,6 +30,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/articles', articleRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/users', userRoutes); // Use the User routes here
+app.use('/api/chat', chatRoutes);
 //app.use('/api/chat', require('./routes/chatRoutes'));
 app.use((req, res) => {
     res.status(404).json({ message: `Route ${req.originalUrl} not found on this server.` });
