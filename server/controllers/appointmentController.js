@@ -78,32 +78,64 @@ const approveByDoctor = async (req, res) => {
 };
 
 // 5. Admin Confirms Payment
+// Add/Update this function in your appointmentcontroller.js
 const confirmByAdmin = async (req, res) => {
   try {
+    const { meetingLink } = req.body; // Admin sends the link here
+
     const appointment = await Appointment.findByIdAndUpdate(
       req.params.id,
       { 
         status: 'Confirmed',
-        'paymentDetails.isPaid': true // FIX: This explicitly sets isPaid to true
+        'paymentDetails.isPaid': true,
+        meetingLink: meetingLink // Save the link
       },
-      { new: true } // This returns the updated document
+      { new: true }
     );
 
-    if (!appointment) {
-      return res.status(404).json({ message: "Appointment not found" });
-    }
-
-    res.json({ message: "Confirmed by admin", appointment });
+    if (!appointment) return res.status(404).json({ message: "Appointment not found" });
+    res.json({ message: "Confirmed and link sent!", appointment });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
+const payAppointment = async (req, res) => {
+  try {
+    const { transactionId } = req.body;
+    const appointment = await Appointment.findByIdAndUpdate(
+      req.params.id,
+      { 
+        status: 'Paid',
+        'paymentDetails.transactionId': transactionId 
+      },
+      { new: true }
+    );
+    res.json({ message: "Payment recorded", appointment });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+// Get all appointments (Admin only)
+exports.getAllAppointments = async (req, res) => {
+  try {
+    // Populate 'user' to get patient name and 'doctor' to get doctor name
+    const appointments = await Appointment.find()
+      .populate('user', 'name email') 
+      .populate('doctor', 'name')
+      .sort({ createdAt: -1 });
+    
+    res.json(appointments);
+  } catch (err) {
+    res.status(500).send("Server Error fetching all appointments");
+  }
+};
 // Ensure ALL functions are exported
 module.exports = { 
   bookAppointment, 
   getMyAppointments, 
   getDoctorRequests, 
   approveByDoctor, 
-  confirmByAdmin 
+  confirmByAdmin,
+  payAppointment
 };

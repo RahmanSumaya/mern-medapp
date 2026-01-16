@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { UserPlus, BookOpen, LogOut, LayoutDashboard, Calendar, CheckCircle } from 'lucide-react';
+import { 
+  UserPlus, BookOpen, LogOut, LayoutDashboard, 
+  Calendar, CheckCircle, Video, Link as LinkIcon, Hash 
+} from 'lucide-react'; // All icons moved here
 import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
@@ -68,6 +71,7 @@ const OverviewStats = () => (
 // --- SUB-COMPONENT: ADMIN APPOINTMENT MANAGER ---
 const AdminAppointmentManager = () => {
   const [appointments, setAppointments] = useState([]);
+  const [meetingLinks, setMeetingLinks] = useState({});
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -78,20 +82,29 @@ const AdminAppointmentManager = () => {
         });
         setAppointments(res.data);
       } catch (err) {
-        console.error("Error fetching appointments");
+        console.error("Error fetching appointments", err);
       }
     };
     fetchAll();
   }, []);
 
   const handleAdminConfirm = async (id) => {
+    const linkToSubmit = meetingLinks[id];
+    if (!linkToSubmit || linkToSubmit.trim() === "") {
+      return alert("Please enter a meeting link before confirming.");
+    }
+
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`http://localhost:5000/api/appointments/admin-confirm/${id}`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.put(`http://localhost:5000/api/appointments/admin-confirm/${id}`, 
+        { meetingLink: linkToSubmit }, 
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
       alert("Payment Verified & Appointment Confirmed!");
-      setAppointments(appointments.map(app => app._id === id ? { ...app, status: 'Confirmed' } : app));
+      setAppointments(appointments.map(app => 
+        app._id === id ? { ...app, status: 'Confirmed', meetingLink: linkToSubmit } : app
+      ));
     } catch (err) {
       alert("Verification failed. Ensure status is 'Paid'");
     }
@@ -106,7 +119,7 @@ const AdminAppointmentManager = () => {
             <tr className="border-b text-slate-400 text-sm">
               <th className="pb-3 px-2 font-semibold">Patient</th>
               <th className="pb-3 px-2 font-semibold">Doctor</th>
-              <th className="pb-3 px-2 font-semibold">Date/Time</th>
+              <th className="pb-3 px-2 font-semibold">Details</th>
               <th className="pb-3 px-2 font-semibold">Status</th>
               <th className="pb-3 px-2 font-semibold">Action</th>
             </tr>
@@ -114,25 +127,58 @@ const AdminAppointmentManager = () => {
           <tbody className="text-slate-700">
             {appointments.map(app => (
               <tr key={app._id} className="border-b last:border-0 hover:bg-slate-50 transition-colors">
-                <td className="py-4 px-2 font-medium">{app.patient?.name}</td>
-                <td className="py-4 px-2">{app.doctor?.name}</td>
-                <td className="py-4 px-2 text-sm">{app.date} at {app.time}</td>
-                <td className="py-4 px-2">
-                  <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase border ${
-                    app.status === 'Paid' ? 'bg-blue-100 text-blue-700 border-blue-200' : 
-                    app.status === 'Confirmed' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-gray-100 text-gray-500 border-gray-200'
-                  }`}>
-                    {app.status}
-                  </span>
+                <td className="py-4 px-2 font-medium">
+                   <div>{app.user?.name || 'Unknown'}</div>
+                   <div className="text-[10px] text-slate-400">{app.user?.email}</div>
+                </td>
+                <td className="py-4 px-2">{app.doctor?.name || 'Doctor'}</td>
+                <td className="py-4 px-2 text-sm">
+                  <div className="font-semibold">{app.date}</div>
+                  <div className="text-xs text-slate-500">{app.time}</div>
                 </td>
                 <td className="py-4 px-2">
-                  {app.status === 'Paid' && (
-                    <button 
-                      onClick={() => handleAdminConfirm(app._id)}
-                      className="flex items-center gap-1 bg-green-600 text-white px-3 py-1 rounded-lg text-xs hover:bg-green-700 transition shadow-sm"
-                    >
-                      <CheckCircle size={14} /> Confirm Payment
-                    </button>
+                  <div className="flex flex-col gap-1">
+                    <span className={`w-fit px-3 py-1 rounded-full text-[10px] font-bold uppercase border ${
+                      app.status === 'Paid' ? 'bg-purple-100 text-purple-700 border-purple-200' : 
+                      app.status === 'Confirmed' ? 'bg-green-100 text-green-700 border-green-200' : 
+                      app.status === 'DoctorApproved' ? 'bg-blue-100 text-blue-700 border-blue-200' :
+                      'bg-gray-100 text-gray-500 border-gray-200'
+                    }`}>
+                      {app.status}
+                    </span>
+                    {app.paymentDetails?.transactionId && (
+                      <div className="flex items-center gap-1 text-[10px] font-mono text-slate-500 mt-1">
+                        <Hash size={10} /> {app.paymentDetails.transactionId}
+                      </div>
+                    )}
+                  </div>
+                </td>
+                <td className="py-4 px-2">
+                  {app.status === 'Paid' ? (
+                    <div className="flex flex-col gap-2">
+                      <div className="relative">
+                        <Video size={14} className="absolute left-2 top-2.5 text-slate-400" />
+                        <input 
+                          type="text" 
+                          placeholder="Meeting Link" 
+                          className="pl-8 p-2 text-xs border rounded-xl w-full focus:ring-2 focus:ring-indigo-500 outline-none bg-slate-50"
+                          value={meetingLinks[app._id] || ""}
+                          onChange={(e) => setMeetingLinks({...meetingLinks, [app._id]: e.target.value})}
+                        />
+                      </div>
+                      <button 
+                        onClick={() => handleAdminConfirm(app._id)}
+                        className="flex items-center justify-center gap-1 bg-indigo-600 text-white px-3 py-2 rounded-xl text-xs font-bold hover:bg-indigo-700"
+                      >
+                        <CheckCircle size={14} /> Verify & Confirm
+                      </button>
+                    </div>
+                  ) : app.status === 'Confirmed' ? (
+                    <div className="flex items-center gap-1 text-xs text-emerald-600 font-medium">
+                      <LinkIcon size={12} /> Link Sent
+                    </div>
+                  ) : (
+                    <span className="text-xs text-slate-400 italic">Waiting...</span>
                   )}
                 </td>
               </tr>
@@ -146,8 +192,11 @@ const AdminAppointmentManager = () => {
 
 // --- SUB-COMPONENT: ADD DOCTOR FORM ---
 const AddDoctorForm = () => {
-  const [docData, setDocData] = useState({ name: '', email: '', password: '', specialization: '', hourlyRate: '' });
-
+  const [docData, setDocData] = useState({ 
+    name: '', email: '', password: '', specialization: '', 
+    hourlyRate: '', experience: '', hospitalName: '', about: '', address: '' 
+  });
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -156,9 +205,9 @@ const AddDoctorForm = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert('Doctor Added Successfully!');
-      setDocData({ name: '', email: '', password: '', specialization: '', hourlyRate: '' });
+      setDocData({ name: '', email: '', password: '', specialization: '', hourlyRate: '', experience: '', hospitalName: '', about: '', address: '' });
     } catch (err) {
-      alert('Error adding doctor');
+      alert('Error: ' + (err.response?.data?.msg || "Server Error"));
     }
   };
 
@@ -166,12 +215,16 @@ const AddDoctorForm = () => {
     <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 max-w-2xl">
       <h2 className="text-2xl font-bold mb-6 text-slate-800">Register New Doctor</h2>
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input type="text" placeholder="Full Name" className="p-3 border rounded-xl col-span-1 md:col-span-2 bg-slate-50" value={docData.name} onChange={e => setDocData({...docData, name: e.target.value})} required />
+        <input type="text" placeholder="Full Name" className="p-3 border rounded-xl col-span-2 bg-slate-50" value={docData.name} onChange={e => setDocData({...docData, name: e.target.value})} required />
         <input type="email" placeholder="Email" className="p-3 border rounded-xl bg-slate-50" value={docData.email} onChange={e => setDocData({...docData, email: e.target.value})} required />
         <input type="password" placeholder="Password" className="p-3 border rounded-xl bg-slate-50" value={docData.password} onChange={e => setDocData({...docData, password: e.target.value})} required />
         <input type="text" placeholder="Specialization" className="p-3 border rounded-xl bg-slate-50" value={docData.specialization} onChange={e => setDocData({...docData, specialization: e.target.value})} />
+        <input type="number" placeholder="Experience (Years)" className="p-3 border rounded-xl bg-slate-50" value={docData.experience} onChange={e => setDocData({...docData, experience: e.target.value})} />
+        <input type="text" placeholder="Hospital Name" className="p-3 border rounded-xl bg-slate-50" value={docData.hospitalName} onChange={e => setDocData({...docData, hospitalName: e.target.value})} />
         <input type="number" placeholder="Hourly Rate ($)" className="p-3 border rounded-xl bg-slate-50" value={docData.hourlyRate} onChange={e => setDocData({...docData, hourlyRate: e.target.value})} />
-        <button className="col-span-1 md:col-span-2 bg-indigo-600 text-white p-3 rounded-xl font-bold hover:bg-indigo-700 transition mt-2 shadow-lg shadow-indigo-100">Create Doctor Account</button>
+        <input type="text" placeholder="Work Address" className="p-3 border rounded-xl col-span-2 bg-slate-50" value={docData.address} onChange={e => setDocData({...docData, address: e.target.value})} />
+        <textarea placeholder="Biography" className="p-3 border rounded-xl col-span-2 bg-slate-50 h-32" value={docData.about} onChange={e => setDocData({...docData, about: e.target.value})} />
+        <button className="col-span-2 bg-indigo-600 text-white p-3 rounded-xl font-bold hover:bg-indigo-700 transition">Create Doctor Account</button>
       </form>
     </div>
   );
@@ -190,61 +243,26 @@ const AddArticleForm = () => {
       await axios.post('http://localhost:5000/api/articles', article, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      alert('Article Published Successfully! 🚀');
+      alert('Article Published! 🚀');
       setArticle({ title: '', diseaseName: '', content: '', symptoms: '', prevention: '', treatments: '', imageUrl: '' });
     } catch (err) {
-      alert('Error publishing article. Make sure you are logged in as Admin.');
+      alert('Error publishing article.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChange = (e) => {
-    setArticle({ ...article, [e.target.name]: e.target.value });
-  };
-
   return (
     <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 max-w-4xl">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-slate-800">Create Health Article</h2>
-        <p className="text-slate-500 text-sm">Fill in the details to add a new disease guide to the library.</p>
-      </div>
-
+      <h2 className="text-2xl font-bold text-slate-800 mb-6">Create Health Article</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-semibold text-slate-700">Article Title</label>
-            <input name="title" value={article.title} onChange={handleChange} placeholder="e.g. Understanding Type 2 Diabetes" className="p-3 border rounded-xl bg-slate-50 focus:ring-2 focus:ring-indigo-500 outline-none" required />
-          </div>
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-semibold text-slate-700">Disease Name</label>
-            <input name="diseaseName" value={article.diseaseName} onChange={handleChange} placeholder="e.g. Diabetes" className="p-3 border rounded-xl bg-slate-50 focus:ring-2 focus:ring-indigo-500 outline-none" required />
-          </div>
+          <input name="title" value={article.title} onChange={e => setArticle({...article, title: e.target.value})} placeholder="Article Title" className="p-3 border rounded-xl bg-slate-50" required />
+          <input name="diseaseName" value={article.diseaseName} onChange={e => setArticle({...article, diseaseName: e.target.value})} placeholder="Disease Name" className="p-3 border rounded-xl bg-slate-50" required />
         </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-semibold text-slate-700">Image URL</label>
-          <input name="imageUrl" value={article.imageUrl} onChange={handleChange} placeholder="https://image-link.com/photo.jpg" className="p-3 border rounded-xl bg-slate-50 focus:ring-2 focus:ring-indigo-500 outline-none" />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-semibold text-slate-700">Main Content / Overview</label>
-          <textarea name="content" value={article.content} onChange={handleChange} rows="4" placeholder="Write the main description here..." className="p-3 border rounded-xl bg-slate-50 focus:ring-2 focus:ring-indigo-500 outline-none" required />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-semibold text-slate-700">Symptoms</label>
-            <textarea name="symptoms" value={article.symptoms} onChange={handleChange} placeholder="List symptoms..." className="p-3 border rounded-xl bg-slate-50 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
-          </div>
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-semibold text-slate-700">Prevention</label>
-            <textarea name="prevention" value={article.prevention} onChange={handleChange} placeholder="List prevention tips..." className="p-3 border rounded-xl bg-slate-50 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
-          </div>
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-semibold text-slate-700">Treatments</label>
-            <textarea name="treatments" value={article.treatments} onChange={handleChange} placeholder="List treatments..." className="p-3 border rounded-xl bg-slate-50 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
-          </div>
-        </div>
-        <button disabled={loading} className={`w-full py-4 rounded-2xl font-bold text-white shadow-lg transition-all ${loading ? 'bg-slate-400' : 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-100'}`}>
-          {loading ? 'Publishing...' : 'Publish Article to Library'}
+        <textarea name="content" value={article.content} onChange={e => setArticle({...article, content: e.target.value})} rows="4" placeholder="Main Content" className="p-3 border rounded-xl bg-slate-50 w-full" required />
+        <button disabled={loading} className="w-full py-4 rounded-2xl font-bold text-white bg-indigo-600 hover:bg-indigo-700">
+          {loading ? 'Publishing...' : 'Publish Article'}
         </button>
       </form>
     </div>

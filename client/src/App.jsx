@@ -7,6 +7,8 @@ import AdminDashboard from './pages/AdminDashboard';
 import HealthLibrary from './pages/HealthLibrary';
 import ArticleDetail from './pages/ArticleDetail';
 import AllDoctors from './pages/AllDoctors';
+import BookAppointment from './pages/BookAppointment';
+import DoctorDetails from './pages/DoctorDetails';
 import PatientDashboard from './pages/PatientDashboard'; 
 import DoctorDashboard from './pages/DoctorDashboard'; 
 import Chatbot from './pages/Chatbot'; 
@@ -39,7 +41,8 @@ function App() {
         <Route path="/article/:id" element={<ArticleDetail />} />
         <Route path="/all-doctors" element={<AllDoctors />} />
         <Route path="/account" element={<Account/>} />
-
+        <Route path="/doctor/:id" element={<DoctorDetails />} />
+<Route path="/book-appointment/:doctorId" element={<BookAppointment />} />
         {/* Patient Only Routes */}
         <Route 
           path="/dashboard" 

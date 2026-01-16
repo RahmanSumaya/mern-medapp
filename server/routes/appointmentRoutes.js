@@ -5,7 +5,9 @@ const {
   getMyAppointments, 
   getDoctorRequests,
   approveByDoctor,
-  confirmByAdmin 
+  confirmByAdmin,
+  payAppointment,
+  getAllAppointments
 } = require('../controllers/appointmentController');
 
 // FIX 1: Import BOTH protect and authorize
@@ -21,5 +23,5 @@ router.get('/doctor-requests', protect, authorize('doctor'), getDoctorRequests);
 // Workflow Status Updates
 router.put('/approve/:id', protect, authorize('doctor'), approveByDoctor);
 router.put('/admin-confirm/:id', protect, authorize('admin'), confirmByAdmin);
-
+router.put('/pay/:id', protect, payAppointment);
 module.exports = router;

@@ -7,30 +7,32 @@ const bcrypt = require('bcryptjs');
 // Only Admin can create a Doctor
 router.post('/add-doctor', protect, authorize('admin'), async (req, res) => {
   try {
-    const { name, email, password, specialization, address, phone, hourlyRate } = req.body;
+    const { name, email, password, specialization, address, phone, hourlyRate, experience, hospitalName, about, education } = req.body;
 
     let user = await User.findOne({ email });
     if (user) return res.status(400).json({ msg: "User already exists" });
 
-    // REMOVE THE MANUAL BCRYPT HASHING HERE
-    // The User model's .pre('save') handles it automatically!
-
     const doctor = new User({
-      name,
-      email,
-      password, // Send plain password
-      role: 'doctor',
-      specialization,
-      address,
-      phone,
-      hourlyRate,
+      name, email, password, role: 'doctor',
+      specialization, address, phone, hourlyRate,
+      experience, hospitalName, about, education,
       status: 'available'
     });
 
     await doctor.save();
     res.status(201).json({ msg: "Doctor created successfully", doctor });
   } catch (err) {
-    console.error(err);
+    res.status(500).send("Server Error");
+  }
+});
+
+// ADD THIS NEW ROUTE: Get single doctor by ID
+router.get('/doctor/:id', async (req, res) => {
+  try {
+    const doctor = await User.findById(req.params.id).select('-password');
+    if (!doctor) return res.status(404).json({ msg: "Doctor not found" });
+    res.json(doctor);
+  } catch (err) {
     res.status(500).send("Server Error");
   }
 });

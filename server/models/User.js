@@ -17,6 +17,11 @@ const UserSchema = new mongoose.Schema({
   address: { type: String },
   phone: { type: String },
   hourlyRate: { type: Number },
+  // Add these to your UserSchema in models/User.js
+  experience: { type: Number, default: 0 }, 
+  hospitalName: { type: String },
+  about: { type: String },
+  education: { type: String },
   status: { 
     type: String, 
     enum: ['available', 'unavailable'], 
