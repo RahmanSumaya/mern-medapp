@@ -13,6 +13,7 @@ app.use(express.json());
 const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const appointmentRoutes = require('./routes/appointmentRoutes');
+const datasetRoutes = require('./routes/datasetRoutes');
 const articleRoutes = require('./routes/articleRoutes');
 const userRoutes = require('./routes/userRoutes'); // Added this
 // server.js
@@ -29,8 +30,16 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/articles', articleRoutes);
 app.use('/api/appointments', appointmentRoutes);
+app.use('/api/dataset', datasetRoutes);
 app.use('/api/users', userRoutes); // Use the User routes here
 app.use('/api/chat', chatRoutes);
+// Make the uploads folder accessible via URL
+app.use('/uploads', express.static('uploads'));
+// In server.js
+const fs = require('fs');
+if (!fs.existsSync('./uploads')) {
+    fs.mkdirSync('./uploads');
+}
 //app.use('/api/chat', require('./routes/chatRoutes'));
 app.use((req, res) => {
     res.status(404).json({ message: `Route ${req.originalUrl} not found on this server.` });

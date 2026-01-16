@@ -116,18 +116,21 @@ const payAppointment = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-// Get all appointments (Admin only)
-exports.getAllAppointments = async (req, res) => {
+// Change from "exports.getAllAppointments =" to "const getAllAppointments ="
+const getAllAppointments = async (req, res) => {
   try {
-    // Populate 'user' to get patient name and 'doctor' to get doctor name
     const appointments = await Appointment.find()
       .populate('user', 'name email') 
       .populate('doctor', 'name')
       .sort({ createdAt: -1 });
     
+    // Check if appointments exist (for debugging)
+    console.log("Found appointments:", appointments.length);
+    
     res.json(appointments);
   } catch (err) {
-    res.status(500).send("Server Error fetching all appointments");
+    console.error("Error in getAllAppointments:", err);
+    res.status(500).json({ message: "Server Error fetching all appointments" });
   }
 };
 // Ensure ALL functions are exported
@@ -137,5 +140,6 @@ module.exports = {
   getDoctorRequests, 
   approveByDoctor, 
   confirmByAdmin,
-  payAppointment
+  payAppointment,
+  getAllAppointments
 };

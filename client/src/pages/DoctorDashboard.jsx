@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Calendar, Clock, User, Check, Video, ExternalLink, Hourglass, AlertCircle } from 'lucide-react';
+import { 
+  Calendar, Clock, User, Check, Video, AlertCircle, 
+  Upload, Database, LayoutDashboard, FileText 
+} from 'lucide-react';
 
 const StatusBadge = ({ status }) => {
   const styles = {
@@ -10,7 +13,6 @@ const StatusBadge = ({ status }) => {
     Confirmed: "bg-emerald-100 text-emerald-700 border-emerald-200",
     Cancelled: "bg-rose-100 text-rose-700 border-rose-200",
   };
-
   return (
     <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase border ${styles[status] || styles.Pending}`}>
       {status}
@@ -18,167 +20,198 @@ const StatusBadge = ({ status }) => {
   );
 };
 
+// ... (previous imports: useState, useEffect, axios, lucide-react icons)
+
 const DoctorDashboard = () => {
   const [appointments, setAppointments] = useState([]);
+  const [mydataset, setMydataset] = useState([]); // New state for dataset
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('appointments');
 
   useEffect(() => {
-    const fetchDoctorData = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        // Note: Using the endpoint from your appointmentRoutes.js
-        const res = await axios.get('http://localhost:5000/api/appointments/doctor-requests', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setAppointments(res.data);
-      } catch (err) {
-        console.error("Error fetching doctor data");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchDoctorData();
+    fetchInitialData();
   }, []);
 
-  const handleApprove = async (id) => {
+  const fetchInitialData = async () => {
+    setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      // Updated endpoint to match your routes/appointmentRotes.js
-      await axios.put(`http://localhost:5000/api/appointments/approve/${id}`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      alert("Approved! The patient can now proceed to payment.");
-      setAppointments(appointments.map(app => app._id === id ? { ...app, status: 'DoctorApproved' } : app));
+      const headers = { Authorization: `Bearer ${token}` };
+
+      // Fetch both Appointments and Doctor's own dataset
+      const [appRes, dsRes] = await Promise.all([
+        axios.get('http://localhost:5000/api/appointments/doctor-requests', { headers }),
+        axios.get('http://localhost:5000/api/dataset/doctor/my-uploads', { headers })
+      ]);
+
+      setAppointments(appRes.data);
+      setMydataset(dsRes.data);
     } catch (err) {
-      alert("Approval failed");
+      console.error("Error fetching data");
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (loading) return <div className="p-20 text-center text-slate-500 font-bold">Loading Your Schedule...</div>;
+  return (
+    <div className="min-h-screen bg-slate-50 flex">
+      {/* SIDEBAR */}
+      <div className="w-64 bg-slate-900 text-white p-6 hidden md:block sticky top-0 h-screen">
+        <h2 className="text-xl font-black text-indigo-400 mb-10">MEDCONNECT</h2>
+        <nav className="space-y-4">
+          <button 
+            onClick={() => setActiveTab('appointments')}
+            className={`w-full flex items-center gap-3 p-3 rounded-xl transition ${activeTab === 'appointments' ? 'bg-indigo-600' : 'hover:bg-slate-800'}`}
+          >
+            <LayoutDashboard size={20} /> Appointments
+          </button>
+          <button 
+            onClick={() => setActiveTab('upload')}
+            className={`w-full flex items-center gap-3 p-3 rounded-xl transition ${activeTab === 'upload' ? 'bg-indigo-600' : 'hover:bg-slate-800'}`}
+          >
+            <Upload size={20} /> Manage dataset
+          </button>
+        </nav>
+      </div>
+
+      {/* MAIN CONTENT */}
+      <div className="flex-1 p-6 md:p-12">
+        {activeTab === 'appointments' ? (
+          /* ... Your Existing Appointments UI ... */
+          <div>Appointment View...</div>
+        ) : (
+          <div className="space-y-10">
+            {/* 1. UPLOAD FORM */}
+            <UploadDatasetForm onUploadSuccess={fetchInitialData} />
+
+            {/* 2. HISTORY TABLE */}
+            <section className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
+              <h3 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <FileText className="text-indigo-500" size={22} /> My Upload History
+              </h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="text-slate-400 text-xs uppercase tracking-widest border-b border-slate-50">
+                      <th className="pb-4 px-2">Title</th>
+                      <th className="pb-4 px-2">Date</th>
+                      <th className="pb-4 px-2">Downloads</th>
+                      <th className="pb-4 px-2">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {myataset.map((ds) => (
+                      <tr key={ds._id} className="border-b border-slate-50 last:border-0 hover:bg-slate-50/50">
+                        <td className="py-4 px-2 font-bold text-slate-700 text-sm">{ds.title}</td>
+                        <td className="py-4 px-2 text-slate-500 text-xs">{new Date(ds.createdAt).toLocaleDateString()}</td>
+                        <td className="py-4 px-2 text-slate-500 text-xs font-mono">{ds.downloadCount || 0}</td>
+                        <td className="py-4 px-2">
+                          <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${
+                            ds.status === 'Approved' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                          }`}>
+                            {ds.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                    {myDataset.length === 0 && (
+                      <tr>
+                        <td colSpan="4" className="py-10 text-center text-slate-400 italic">No dataset uploaded yet.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// IMPROVED UPLOAD FORM COMPONENT
+const UploadDatasetForm = () => {
+  const [file, setFile] = useState(null);
+  const [title, setTitle] = useState('');
+  const [uploading, setUploading] = useState(false);
+
+  const handleUpload = async (e) => {
+    e.preventDefault();
+    if (!file || !title) return alert("Please provide both title and file.");
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('file', file);
+
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post('http://localhost:5000/api/dataset/upload', formData, {
+        headers: { 
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}` 
+        }
+      });
+      alert("Dataset uploaded successfully! It is now pending Admin approval.");
+      setTitle('');
+      setFile(null);
+    } catch (err) {
+      alert("Upload failed. Make sure the file is under 10MB.");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6 md:p-12">
-      <div className="max-w-6xl mx-auto">
-        <header className="mb-10">
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">DOCTOR DASHBOARD</h1>
-          <p className="text-slate-500 font-medium">Manage your patient requests and upcoming meetings.</p>
-        </header>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          {/* LEFT: PENDING REQUESTS (2 Cols Wide) */}
-          <div className="lg:col-span-2 space-y-8">
-            <section className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
-              <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-                <Hourglass className="text-amber-500" size={22} /> New Patient Requests
-              </h2>
-              
-              <div className="space-y-4">
-                {appointments.filter(a => a.status === 'Pending').length === 0 ? (
-                  <div className="py-10 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-slate-400 italic">
-                    No pending requests at the moment.
-                  </div>
-                ) : (
-                  appointments.filter(a => a.status === 'Pending').map(app => (
-                    <div key={app._id} className="flex flex-col md:flex-row md:items-center justify-between p-5 bg-amber-50 rounded-2xl border border-amber-100">
-                      <div className="flex items-center gap-4">
-                        <div className="bg-white p-3 rounded-xl text-amber-600 shadow-sm"><User size={24}/></div>
-                        <div>
-                          <p className="font-black text-slate-800 uppercase tracking-tight">{app.user?.name || 'Unknown Patient'}</p>
-                          <div className="flex gap-4 text-xs font-bold text-slate-500 mt-1">
-                            <span className="flex items-center gap-1"><Calendar size={14}/> {app.date}</span>
-                            <span className="flex items-center gap-1"><Clock size={14}/> {app.time}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <button 
-                        onClick={() => handleApprove(app._id)}
-                        className="mt-4 md:mt-0 bg-slate-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-600 transition-all shadow-lg active:scale-95"
-                      >
-                        Accept Request
-                      </button>
-                    </div>
-                  ))
-                )}
-              </div>
-            </section>
-
-            {/* UPCOMING CONFIRMED MEETINGS */}
-            <section className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
-              <h2 className="text-xl font-bold text-emerald-600 mb-6 flex items-center gap-2">
-                <Check size={22} /> Confirmed Schedule
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {appointments.filter(a => a.status === 'Confirmed').map(app => (
-                  <div key={app._id} className="p-5 border rounded-2xl bg-emerald-50 border-emerald-100 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-2 bg-emerald-100 text-emerald-600 rounded-bl-xl">
-                      <Check size={16} />
-                    </div>
-                    <p className="font-bold text-slate-800">{app.user?.name}</p>
-                    <div className="text-sm text-slate-600 mt-2 space-y-1">
-                      <p className="flex items-center gap-2 font-medium text-xs uppercase text-slate-400 tracking-widest"><Calendar size={14}/> {app.date}</p>
-                      <p className="flex items-center gap-2 font-medium text-xs uppercase text-slate-400 tracking-widest"><Clock size={14}/> {app.time}</p>
-                    </div>
-                    
-                    {app.meetingLink && (
-                      <a 
-                        href={app.meetingLink} 
-                        target="_blank" 
-                        rel="noreferrer"
-                        className="mt-4 flex items-center justify-center gap-2 w-full bg-emerald-600 text-white py-2 rounded-lg font-bold text-xs hover:bg-slate-900 transition-colors"
-                      >
-                        <Video size={14} /> START MEETING
-                      </a>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </section>
-          </div>
-
-          {/* RIGHT SIDE: WAITING AREA */}
-          <div className="space-y-6">
-            <div className="bg-indigo-900 text-white p-6 rounded-[2rem] shadow-xl">
-              <h3 className="font-bold flex items-center gap-2 mb-4">
-                <AlertCircle size={18} /> Process Overview
-              </h3>
-              <div className="space-y-4 text-xs">
-                <div className="flex gap-3">
-                  <div className="w-6 h-6 rounded-full bg-indigo-700 flex items-center justify-center shrink-0">1</div>
-                  <p className="text-indigo-200">Approve patient requests to allow them to pay.</p>
-                </div>
-                <div className="flex gap-3">
-                  <div className="w-6 h-6 rounded-full bg-indigo-700 flex items-center justify-center shrink-0">2</div>
-                  <p className="text-indigo-200">Wait for Admin to verify payment and set the link.</p>
-                </div>
-                <div className="flex gap-3">
-                  <div className="w-6 h-6 rounded-full bg-indigo-700 flex items-center justify-center shrink-0">3</div>
-                  <p className="text-indigo-200">Meeting links appear automatically in "Confirmed Schedule".</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
-              <h3 className="font-bold text-slate-800 mb-4 text-sm uppercase tracking-widest">Awaiting Payment</h3>
-              <div className="space-y-3">
-                {appointments.filter(a => a.status === 'DoctorApproved' || a.status === 'Paid').map(app => (
-                  <div key={app._id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
-                    <div>
-                      <p className="text-sm font-bold text-slate-700">{app.user?.name}</p>
-                      <p className="text-[10px] text-slate-400 font-bold">{app.date}</p>
-                    </div>
-                    <StatusBadge status={app.status} />
-                  </div>
-                ))}
-                {appointments.filter(a => a.status === 'DoctorApproved' || a.status === 'Paid').length === 0 && (
-                  <p className="text-[10px] text-slate-400 italic">No pending payments.</p>
-                )}
-              </div>
-            </div>
-          </div>
-
+    <div className="max-w-2xl bg-white p-10 rounded-[2rem] shadow-sm border border-slate-100">
+      <div className="flex items-center gap-4 mb-8">
+        <div className="p-4 bg-indigo-100 text-indigo-600 rounded-2xl">
+          <Database size={30} />
+        </div>
+        <div>
+          <h2 className="text-2xl font-black text-slate-800">Upload Research Dataset</h2>
+          <p className="text-slate-500 text-sm">Contribute medical data to the public library.</p>
         </div>
       </div>
+
+      <form onSubmit={handleUpload} className="space-y-6">
+        <div>
+          <label className="block text-sm font-bold text-slate-700 mb-2">Dataset Title</label>
+          <input 
+            type="text" 
+            className="w-full p-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none"
+            placeholder="e.g., Heart Disease Patterns 2024"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)} 
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-bold text-slate-700 mb-2">Select File (CSV, PDF, ZIP)</label>
+          <div className="relative group">
+            <input 
+              type="file" 
+              className="absolute inset-0 opacity-0 cursor-pointer z-10"
+              onChange={(e) => setFile(e.target.files[0])} 
+            />
+            <div className="p-8 border-2 border-dashed border-slate-200 rounded-2xl text-center group-hover:border-indigo-400 transition-colors">
+              <Upload className="mx-auto text-slate-300 mb-2" size={32} />
+              <p className="text-slate-500 font-medium">
+                {file ? file.name : "Click to browse or drag and drop"}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <button 
+          type="submit" 
+          disabled={uploading}
+          className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-indigo-100 hover:bg-slate-900 transition-all flex items-center justify-center gap-2"
+        >
+          {uploading ? "Processing..." : <><Check size={18} /> Submit for Review</>}
+        </button>
+      </form>
     </div>
   );
 };

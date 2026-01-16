@@ -82,25 +82,29 @@ exports.getMe = async (req, res) => { // Removed 'next'
 // 4. UPDATE PROFILE
 exports.updateProfile = async (req, res) => {
   try {
-    const { name, phone, address, gender, dob, profilePic } = req.body;
+    // Destructure all possible fields
+    const { 
+      name, phone, address, gender, dob, profilePic, 
+      specialization, hourlyRate, experience, hospitalName, about, education 
+    } = req.body;
 
-    // Use findByIdAndUpdate to bypass the 'pre-save' hook issues
+    const updateData = { 
+      name, phone, address, gender, dob, profilePic, 
+      specialization, hourlyRate, experience, hospitalName, about, education 
+    };
+
+    // Remove undefined fields so we don't overwrite with null
+    Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
+
     const updatedUser = await User.findByIdAndUpdate(
       req.user.id,
-      { 
-        $set: { name, phone, address, gender, dob, profilePic } 
-      },
+      { $set: updateData },
       { new: true, runValidators: true }
     ).select('-password');
 
-    if (!updatedUser) {
-      return res.status(404).json({ msg: "User not found" });
-    }
-
-    return res.json(updatedUser);
+    res.json(updatedUser);
   } catch (err) {
-    console.error("Update Error:", err.message);
-    return res.status(500).json({ msg: "Server Error", error: err.message });
+    res.status(500).json({ msg: "Server Error", error: err.message });
   }
 };
 // controllers/authController.js

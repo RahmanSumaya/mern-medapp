@@ -27,12 +27,12 @@ const Home = () => {
           <div className="bg-slate-800 text-white p-1 rounded font-bold">logo</div>
           <span className="text-xl font-bold text-slate-800">Sumatsina</span>
         </div>
-        
         <div className="hidden md:flex gap-8 font-medium text-gray-600">
           <button onClick={() => navigate('/')} className="hover:text-blue-600 border-b-2 border-blue-600">Home</button>
           <button onClick={() => navigate('/all-doctors')} className="hover:text-blue-600">All Doctors</button>
           <button className="hover:text-blue-600">Contact</button>
           <button className="hover:text-blue-600">About Us</button>
+          <button onClick={() => navigate('/datasets')} className="hover:text-blue-600">Dataset</button>
         </div>
 
         {/* AUTH SECTION */}
@@ -54,6 +54,7 @@ const Home = () => {
               Account
             </button>
           )}
+          
         </div>
       </nav>
 
