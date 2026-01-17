@@ -13,6 +13,9 @@ import PatientDashboard from './pages/PatientDashboard';
 import DoctorDashboard from './pages/DoctorDashboard'; 
 import Chatbot from './pages/Chatbot'; 
 import DatasetLibrary from './pages/datasetLibrary';
+import DoctorPatientView from './pages/DoctorPatientView';
+import PatientRecords from './pages/PatientRecords';
+
 // --- PROTECTED ROUTE COMPONENT ---
 const ProtectedRoute = ({ children, allowedRole }) => {
   const token = localStorage.getItem('token');
@@ -44,7 +47,9 @@ function App() {
         <Route path="/account" element={<Account/>} />
         <Route path="/doctor/:id" element={<DoctorDetails />} />
         <Route path="/datasets" element={<DatasetLibrary />} />
-<Route path="/book-appointment/:doctorId" element={<BookAppointment />} />
+        <Route path="/doctor/patient-history/:patientId" element={<DoctorPatientView />} />
+        <Route path="/patientRecords" element={<PatientRecords/>} />
+        <Route path="/book-appointment/:doctorId" element={<BookAppointment />} />
         {/* Patient Only Routes */}
         <Route 
           path="/dashboard" 

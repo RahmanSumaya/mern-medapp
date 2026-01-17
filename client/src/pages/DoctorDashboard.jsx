@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { 
   Calendar, Clock, User, Check, Video, AlertCircle, 
@@ -22,6 +23,7 @@ const StatusBadge = ({ status }) => {
 };
 
 const DoctorDashboard = () => {
+  const navigate = useNavigate();
   const [appointments, setAppointments] = useState([]);
   const [myDataset, setMyDataset] = useState([]);
   const [doctorData, setDoctorData] = useState(null);
@@ -158,15 +160,29 @@ const DoctorDashboard = () => {
                       <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                         <div className="flex items-center gap-5">
                           <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-indigo-600 shadow-sm border border-slate-100 font-black text-xl">
-                            {app.user?.name?.charAt(0) || 'P'}
-                          </div>
-                          <div>
-                            <p className="font-black text-slate-800 uppercase text-lg tracking-tighter">{app.user?.name || 'Unknown Patient'}</p>
-                            <div className="flex gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
-                              <span className="flex items-center gap-1"><Calendar size={12}/> {app.date}</span>
-                              <span className="flex items-center gap-1"><Clock size={12}/> {app.time}</span>
-                            </div>
-                          </div>
+                               {app.user?.name?.charAt(0) || 'P'}
+                           </div>
+                           <div>
+                            <div className="flex items-center gap-3">
+                              <p className="font-black text-slate-800 uppercase text-lg tracking-tighter">
+                                  {app.user?.name || 'Unknown Patient'}
+                              </p>
+      
+      {/* IMPROVED NAVIGATION BUTTON */}
+      <button 
+        onClick={() => navigate(`/doctor/patient-history/${app.user?._id}`)}
+        className="flex items-center gap-1 px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-all shadow-sm border border-indigo-100"
+      >
+        <FileText size={12}/> View History
+      </button>
+    </div>
+    
+    <div className="flex gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+      <span className="flex items-center gap-1"><Calendar size={12}/> {app.date}</span>
+      <span className="flex items-center gap-1"><Clock size={12}/> {app.time}</span>
+    </div>
+  </div>
+
                         </div>
 
                         <div className="flex items-center gap-4">

@@ -1,27 +1,39 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const fs = require('fs');
+const path = require('path'); // ADDED THIS
 require('dotenv').config();
 
 const app = express();
 
-// 1. GLOBAL MIDDLEWARE (Must be before routes)
+// 1. GLOBAL MIDDLEWARE
 app.use(cors()); 
 app.use(express.json());
 
-// 2. IMPORT ROUTERS
+// 2. DIRECTORY SETTINGS (Fixes the ENOENT Error)
+// This creates 'uploads' and 'uploads/records' if they don't exist
+const recordsDir = path.join(__dirname, 'uploads', 'records');
+if (!fs.existsSync(recordsDir)) {
+    fs.mkdirSync(recordsDir, { recursive: true });
+    console.log("✅ Created directory:", recordsDir);
+}
+
+// 3. STATIC FILES
+// This allows the browser to open the files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// 4. IMPORT ROUTERS
 const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const appointmentRoutes = require('./routes/appointmentRoutes');
 const datasetRoutes = require('./routes/datasetRoutes');
 const articleRoutes = require('./routes/articleRoutes');
-const userRoutes = require('./routes/userRoutes'); // Added this
-// server.js
-const chatRoutes = require('./routes/chatRoutes'); // 1. Import
-// ... other imports
+const userRoutes = require('./routes/userRoutes'); 
+const recordRoutes = require('./routes/recordRoutes');
+const chatRoutes = require('./routes/chatRoutes');
 
-
-// 3. ROUTES
+// 5. ROUTES
 app.get('/', (req, res) => {
   res.send("API is running...");
 });
@@ -30,21 +42,17 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/articles', articleRoutes);
 app.use('/api/appointments', appointmentRoutes);
+app.use('/api/records', recordRoutes);
 app.use('/api/dataset', datasetRoutes);
-app.use('/api/users', userRoutes); // Use the User routes here
+app.use('/api/users', userRoutes);
 app.use('/api/chat', chatRoutes);
-// Make the uploads folder accessible via URL
-app.use('/uploads', express.static('uploads'));
-// In server.js
-const fs = require('fs');
-if (!fs.existsSync('./uploads')) {
-    fs.mkdirSync('./uploads');
-}
-//app.use('/api/chat', require('./routes/chatRoutes'));
+
+// 404 Handler
 app.use((req, res) => {
-    res.status(404).json({ message: `Route ${req.originalUrl} not found on this server.` });
+    res.status(404).json({ message: `Route ${req.originalUrl} not found.` });
 });
-// 4. DATABASE & START
+
+// 6. DATABASE & START
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch(err => console.error("❌ Connection Error:", err));
