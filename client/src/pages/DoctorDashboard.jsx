@@ -84,7 +84,7 @@ const DoctorDashboard = () => {
       {/* SIDEBAR */}
       <div className="w-64 bg-slate-900 text-white p-6 hidden md:block sticky top-0 h-screen shadow-2xl">
         <div className="mb-10 px-2">
-            <h2 className="text-2xl font-black text-indigo-400 tracking-tighter">MEDCONNECT</h2>
+            <h2 className="text-2xl font-black text-indigo-400 tracking-tighter">Sumtasina</h2>
             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Doctor Portal</p>
         </div>
         

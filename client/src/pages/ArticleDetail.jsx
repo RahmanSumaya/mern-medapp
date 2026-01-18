@@ -104,6 +104,7 @@ const ArticleDetail = () => {
           </button>
         </div>
       </div>
+      
     </div>
   );
 };

@@ -28,7 +28,7 @@ const AdminDashboard = () => {
       {/* SIDEBAR */}
       <div className="w-64 bg-slate-900 text-white flex flex-col sticky top-0 h-screen">
         <div className="p-6 text-2xl font-bold border-b border-slate-800 text-indigo-400">
-          MedConnect Admin
+          Sumtasina Admin
         </div>
         <nav className="flex-1 p-4 space-y-2">
           <button

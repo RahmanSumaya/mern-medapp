@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { User, Mail, Phone, MapPin, Calendar, Edit2, Check, X, Clock, Stethoscope, LogOut, CreditCard, Video, ExternalLink } from 'lucide-react';
-
+// Around Line 4
+import { User, Mail, Phone, MapPin, Calendar, Edit2, Check, X, Clock, Stethoscope, LogOut, CreditCard, Video, ExternalLink, ArrowLeft } from 'lucide-react';
+import Chatbot from './Chatbot';
 const StatusBadge = ({ status }) => {
   const styles = {
     Pending: "bg-amber-100 text-amber-700 border-amber-200",
@@ -98,7 +99,18 @@ const PatientDashboard = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 p-6 md:p-12 space-y-10">
-      
+      {/* BACK BUTTON TO HOMEPAGE */}
+    <div className="max-w-4xl mx-auto">
+      <button 
+        onClick={() => navigate('/')} 
+        className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 font-bold transition-all group"
+      >
+        <div className="bg-white p-2 rounded-lg shadow-sm border border-slate-100 group-hover:bg-indigo-50 transition-colors">
+          <ArrowLeft size={18} />
+        </div>
+        Back to Home
+      </button>
+    </div>
       {/* SECTION 1: PROFILE CARD */}
       <div className="max-w-4xl mx-auto bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
         <div className="h-32 bg-gradient-to-r from-blue-600 to-indigo-600 relative">
@@ -236,6 +248,8 @@ const PatientDashboard = () => {
                       </div>
                     </div>
                   )}
+                  {/* SECTION 3: CHATBOT */}
+                <Chatbot />
                 </div>
               ))
             )}

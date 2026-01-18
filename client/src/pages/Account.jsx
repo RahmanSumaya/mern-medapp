@@ -8,7 +8,7 @@ const Home = () => {
       {/* Hero Section */}
       <div className="text-center mb-12">
         <h1 className="text-5xl font-extrabold text-blue-900 mb-4">
-          MedConnect
+          Sumtasina
         </h1>
         <p className="text-xl text-blue-700 max-w-md mx-auto">
           Your trusted bridge to quality healthcare. Expert doctors, just a click away.

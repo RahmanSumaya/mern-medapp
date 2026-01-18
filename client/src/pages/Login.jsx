@@ -49,7 +49,7 @@ const Login = () => {
       <div className="bg-white p-8 rounded-[2rem] shadow-xl shadow-slate-200/50 w-full max-w-md border border-slate-100">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Welcome Back</h2>
-          <p className="text-slate-500 mt-2">Access your MedConnect account</p>
+          <p className="text-slate-500 mt-2">Access your Sumtasina account</p>
         </div>
         
         {error && (
