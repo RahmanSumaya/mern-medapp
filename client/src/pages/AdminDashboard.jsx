@@ -428,6 +428,7 @@ const AddDoctorForm = () => {
 };
 
 // --- SUB-COMPONENT: ADD ARTICLE FORM ---
+// --- SUB-COMPONENT: ADD ARTICLE FORM ---
 const AddArticleForm = () => {
   const [article, setArticle] = useState({
     title: "",
@@ -439,6 +440,12 @@ const AddArticleForm = () => {
     imageUrl: "",
   });
   const [loading, setLoading] = useState(false);
+
+  // Helper to handle all input changes
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setArticle((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -465,44 +472,87 @@ const AddArticleForm = () => {
     }
   };
 
+  const inputClasses = "p-3 border rounded-xl bg-slate-50 w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all";
+
   return (
-    <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 max-w-4xl">
+    <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 max-w-4xl mx-auto">
       <h2 className="text-2xl font-bold text-slate-800 mb-6">
         Create Health Article
       </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Row 1: Title and Disease Name */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <input
             name="title"
             value={article.title}
-            onChange={(e) => setArticle({ ...article, title: e.target.value })}
+            onChange={handleChange}
             placeholder="Article Title"
-            className="p-3 border rounded-xl bg-slate-50"
+            className={inputClasses}
             required
           />
           <input
             name="diseaseName"
             value={article.diseaseName}
-            onChange={(e) =>
-              setArticle({ ...article, diseaseName: e.target.value })
-            }
-            placeholder="Disease Name"
-            className="p-3 border rounded-xl bg-slate-50"
+            onChange={handleChange}
+            placeholder="Disease Name (e.g. Type 2 Diabetes)"
+            className={inputClasses}
             required
           />
         </div>
+
+        {/* Row 2: Image URL */}
+        <input
+          name="imageUrl"
+          value={article.imageUrl}
+          onChange={handleChange}
+          placeholder="Header Image URL (https://...)"
+          className={inputClasses}
+        />
+
+        {/* Row 3: Main Content */}
         <textarea
           name="content"
           value={article.content}
-          onChange={(e) => setArticle({ ...article, content: e.target.value })}
+          onChange={handleChange}
           rows="4"
-          placeholder="Main Content"
-          className="p-3 border rounded-xl bg-slate-50 w-full"
+          placeholder="General Overview / Introduction"
+          className={inputClasses}
           required
         />
+
+        {/* Row 4: Symptoms, Prevention, Treatments */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <textarea
+            name="symptoms"
+            value={article.symptoms}
+            onChange={handleChange}
+            placeholder="Symptoms (List them...)"
+            className={inputClasses}
+            rows="3"
+          />
+          <textarea
+            name="prevention"
+            value={article.prevention}
+            onChange={handleChange}
+            placeholder="Prevention Tips..."
+            className={inputClasses}
+            rows="3"
+          />
+          <textarea
+            name="treatments"
+            value={article.treatments}
+            onChange={handleChange}
+            placeholder="Available Treatments..."
+            className={inputClasses}
+            rows="3"
+          />
+        </div>
+
+        {/* Submit Button */}
         <button
+          type="submit"
           disabled={loading}
-          className="w-full py-4 rounded-2xl font-bold text-white bg-indigo-600 hover:bg-indigo-700"
+          className="w-full py-4 rounded-2xl font-bold text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 transition-colors shadow-lg shadow-indigo-200"
         >
           {loading ? "Publishing..." : "Publish Article"}
         </button>

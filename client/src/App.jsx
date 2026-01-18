@@ -15,6 +15,7 @@ import Chatbot from './pages/Chatbot';
 import DatasetLibrary from './pages/datasetLibrary';
 import DoctorPatientView from './pages/DoctorPatientView';
 import PatientRecords from './pages/PatientRecords';
+import AboutUs from './pages/Aboutus';
 
 // --- PROTECTED ROUTE COMPONENT ---
 const ProtectedRoute = ({ children, allowedRole }) => {
@@ -50,6 +51,7 @@ function App() {
         <Route path="/doctor/patient-history/:patientId" element={<DoctorPatientView />} />
         <Route path="/patientRecords" element={<PatientRecords/>} />
         <Route path="/book-appointment/:doctorId" element={<BookAppointment />} />
+        <Route path="/about" element={<AboutUs />} />
         {/* Patient Only Routes */}
         <Route 
           path="/dashboard" 

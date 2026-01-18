@@ -43,7 +43,7 @@ const HealthLibrary = () => {
           <input 
             type="text" 
             placeholder="Search disease (e.g. Diabetes, Flu...)" 
-            className="w-full p-4 pl-12 rounded-2xl text-slate-900 outline-none focus:ring-4 focus:ring-indigo-500/30"
+            className="w-full p-4 pl-12 rounded-2xl text-black-900 outline-none focus:ring-4 focus:ring-white-500/10"
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>

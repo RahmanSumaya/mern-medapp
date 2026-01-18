@@ -21,7 +21,20 @@ const Home = () => {
     setIsLoggedIn(false);            // Update local state
     navigate('/');                   // Redirect to home page
   };
-
+const handleDashboardClick = () => {
+  // 1. Get user data (assuming it's stored as a JSON string in localStorage)
+  const user = JSON.parse(localStorage.getItem("user")); 
+  const role = user?.role; // 'admin', 'doctor', or 'user'
+console.log("Current Role:", role); // This will tell you exactly what is being read
+  // 2. Decide the path
+  if (role === "admin") {
+    navigate("/admin-dashboard");
+  } else if (role === "doctor") {
+    navigate("/dashboard_doctor");
+  } else {
+    navigate("/dashboard");
+  }
+};
   // Categories for the dynamic buttons
   const specialties = [
     "Neurologist", "Cardiologist", "Oncologist", 
@@ -42,7 +55,7 @@ const Home = () => {
           <button onClick={() => navigate('/')} className="hover:text-blue-600 border-b-2 border-blue-600">Home</button>
           <button onClick={() => navigate('/all-doctors')} className="hover:text-blue-600">All Doctors</button>
           <button className="hover:text-blue-600">Contact</button>
-          <button className="hover:text-blue-600">About Us</button>
+          <button onClick={() => navigate('/about')} className="hover:text-blue-600">About Us</button>
           <button onClick={() => navigate('/datasets')} className="hover:text-blue-600">Dataset</button>
           <button onClick={() => navigate('/library')} className="hover:text-blue-600">Article Library</button>
         </div>
@@ -53,12 +66,12 @@ const Home = () => {
             <div className="flex items-center gap-3">
               {/* Dashboard Icon */}
               <button 
-                onClick={() => navigate('/dashboard')}
-                className="text-blue-600 hover:text-blue-800 transition-colors"
-                title="Go to Dashboard"
-              >
-                <UserCircle size={35} strokeWidth={1.5} />
-              </button>
+  onClick={handleDashboardClick}
+  className="text-blue-600 hover:text-blue-800 transition-colors"
+  title="Go to Dashboard"
+>
+  <UserCircle size={35} strokeWidth={1.5} />
+</button>
 
               {/* Logout Button */}
               <button 

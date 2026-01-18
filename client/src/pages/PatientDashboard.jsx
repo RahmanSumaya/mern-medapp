@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-// Around Line 4
 import { User, Mail, Phone, MapPin, Calendar, Edit2, Check, X, Clock, Stethoscope, LogOut, CreditCard, Video, ExternalLink, ArrowLeft } from 'lucide-react';
 import Chatbot from './Chatbot';
+
 const StatusBadge = ({ status }) => {
   const styles = {
     Pending: "bg-amber-100 text-amber-700 border-amber-200",
@@ -27,10 +27,8 @@ const PatientDashboard = () => {
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(true);
   const [appointments, setAppointments] = useState([]);
-  
-  // New state for payment handling
   const [transactionId, setTransactionId] = useState("");
-  const [payingFor, setPayingFor] = useState(null); // ID of the appointment being paid
+  const [payingFor, setPayingFor] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,7 +71,6 @@ const PatientDashboard = () => {
     navigate('/');
   };
 
-  // NEW: Payment submission logic
   const handlePaymentSubmit = async (appId) => {
     if (!transactionId) return alert("Please enter a Transaction ID");
     try {
@@ -85,7 +82,6 @@ const PatientDashboard = () => {
       alert("Payment Details Sent! Waiting for Admin verification.");
       setPayingFor(null);
       setTransactionId("");
-      // Refresh list
       const res = await axios.get('http://localhost:5000/api/appointments/my-appointments', { 
         headers: { Authorization: `Bearer ${token}` } 
       });
@@ -99,18 +95,18 @@ const PatientDashboard = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 p-6 md:p-12 space-y-10">
-      {/* BACK BUTTON TO HOMEPAGE */}
-    <div className="max-w-4xl mx-auto">
-      <button 
-        onClick={() => navigate('/')} 
-        className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 font-bold transition-all group"
-      >
-        <div className="bg-white p-2 rounded-lg shadow-sm border border-slate-100 group-hover:bg-indigo-50 transition-colors">
-          <ArrowLeft size={18} />
-        </div>
-        Back to Home
-      </button>
-    </div>
+      <div className="max-w-4xl mx-auto">
+        <button 
+          onClick={() => navigate('/')} 
+          className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 font-bold transition-all group"
+        >
+          <div className="bg-white p-2 rounded-lg shadow-sm border border-slate-100 group-hover:bg-indigo-50 transition-colors">
+            <ArrowLeft size={18} />
+          </div>
+          Back to Home
+        </button>
+      </div>
+
       {/* SECTION 1: PROFILE CARD */}
       <div className="max-w-4xl mx-auto bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
         <div className="h-32 bg-gradient-to-r from-blue-600 to-indigo-600 relative">
@@ -129,9 +125,17 @@ const PatientDashboard = () => {
               <h1 className="text-2xl font-bold text-slate-900">{userData?.name}</h1>
               <p className="text-slate-500 uppercase text-xs font-bold tracking-widest">{userData?.role}</p>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-3 justify-end">
               {!isEditing ? (
                 <>
+                  {/* --- NEW MEDICAL HISTORY BUTTON --- */}
+                  <button 
+                    onClick={() => navigate('/patientRecords')} // Replace with your actual path
+                    className="flex items-center gap-2 bg-indigo-50 text-indigo-600 px-5 py-2 rounded-xl text-sm font-bold hover:bg-indigo-100 transition border border-indigo-100"
+                  >
+                    <Clock size={16} /> My Medical History
+                  </button>
+
                   <button onClick={() => setIsEditing(true)} className="flex items-center gap-2 bg-slate-100 text-slate-700 px-5 py-2 rounded-xl text-sm font-bold hover:bg-slate-200 transition">
                     <Edit2 size={16} /> Edit Profile
                   </button>
@@ -203,7 +207,6 @@ const PatientDashboard = () => {
                     <div className="mt-4 md:mt-0 flex flex-col items-end gap-2">
                       <StatusBadge status={app.status} />
                       
-                      {/* ACTION: PAYMENT BOX */}
                       {app.status === 'DoctorApproved' && (
                         <button 
                           onClick={() => setPayingFor(payingFor === app._id ? null : app._id)}
@@ -213,7 +216,6 @@ const PatientDashboard = () => {
                         </button>
                       )}
 
-                      {/* ACTION: MEETING LINK */}
                       {app.status === 'Confirmed' && app.meetingLink && (
                         <a 
                           href={app.meetingLink} 
@@ -227,14 +229,13 @@ const PatientDashboard = () => {
                     </div>
                   </div>
 
-                  {/* EXPANDABLE PAYMENT FORM */}
                   {payingFor === app._id && (
                     <div className="mt-4 pt-4 border-t border-slate-200 animate-in fade-in slide-in-from-top-2">
                       <p className="text-xs font-bold text-slate-500 uppercase mb-2">Submit Transaction Details</p>
                       <div className="flex gap-2">
                         <input 
                           type="text" 
-                          placeholder="Enter Transaction ID (e.g. TRX9921...)" 
+                          placeholder="Enter Transaction ID" 
                           className="flex-1 p-2 bg-white border rounded-xl outline-none text-sm focus:ring-2 focus:ring-indigo-500"
                           value={transactionId}
                           onChange={(e) => setTransactionId(e.target.value)}
@@ -248,14 +249,15 @@ const PatientDashboard = () => {
                       </div>
                     </div>
                   )}
-                  {/* SECTION 3: CHATBOT */}
-                <Chatbot />
                 </div>
               ))
             )}
           </div>
         </div>
       </div>
+      
+      {/* SECTION 3: CHATBOT moved out of the loop */}
+      <Chatbot />
     </div>
   );
 };

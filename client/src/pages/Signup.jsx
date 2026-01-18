@@ -49,13 +49,6 @@ const Signup = () => {
             onChange={(e) => setFormData({...formData, password: e.target.value})}
           />
           
-          <select 
-            className="w-full p-3 border rounded-lg focus:outline-blue-500 bg-white"
-            onChange={(e) => setFormData({...formData, role: e.target.value})}
-          >
-            <option value="user">Patient</option>
-            <option value="doctor">Doctor</option>
-          </select>
 
           <button type="submit" className="w-full bg-blue-600 text-white p-3 rounded-lg font-bold hover:bg-blue-700 transition">
             Sign Up
