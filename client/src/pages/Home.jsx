@@ -58,6 +58,8 @@ console.log("Current Role:", role); // This will tell you exactly what is being 
           <button onClick={() => navigate('/about')} className="hover:text-blue-600">About Us</button>
           <button onClick={() => navigate('/datasets')} className="hover:text-blue-600">Dataset</button>
           <button onClick={() => navigate('/library')} className="hover:text-blue-600">Article Library</button>
+          <button onClick={() => navigate('/PatientAmbulance')} className="hover:text-blue-600">Ambulance</button>
+          <button onClick={() => navigate('/MarketPlace')} className="hover:text-blue-600">Medicalshop</button>
         </div>
 
         {/* AUTH SECTION */}

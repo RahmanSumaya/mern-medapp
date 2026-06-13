@@ -53,4 +53,18 @@ router.put('/submit-transaction/:orderId', protect, async (req, res) => {
   }
 });
 
+// === NEW: Get patient's own medical shop orders for Dashboard ===
+router.get('/my-orders', protect, async (req, res) => {
+  try {
+    const orders = await Order.find({ patientId: req.user.id })
+      .populate('itemId', 'name price type description')
+      .sort({ createdAt: -1 });
+    
+    res.json(orders);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Server Error" });
+  }
+});
+
 module.exports = router;

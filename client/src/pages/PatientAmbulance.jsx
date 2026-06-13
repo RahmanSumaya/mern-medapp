@@ -86,12 +86,6 @@ const PatientAmbulanceService = () => {
                   Area: {amb.district}
                 </span>
               </div>
-              <button
-                onClick={() => handleBookAmbulance(amb._id)}
-                className="bg-red-600 hover:bg-red-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition shadow-sm"
-              >
-                Dispatch Now
-              </button>
             </div>
           ))}
         </div>

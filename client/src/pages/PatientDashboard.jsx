@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { User, Mail, Phone, MapPin, Calendar, Edit2, Check, X, Clock, Stethoscope, LogOut, CreditCard, Video, ExternalLink, ArrowLeft } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Calendar, Edit2, Check, X, Clock, Stethoscope, LogOut, CreditCard, Video, ExternalLink, ArrowLeft, ShoppingBag, CheckCircle } from 'lucide-react';
 import Chatbot from './Chatbot';
+
 const StatusBadge = ({ status }) => {
   const styles = {
     Pending: "bg-amber-100 text-amber-700 border-amber-200",
@@ -26,8 +27,10 @@ const PatientDashboard = () => {
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(true);
   const [appointments, setAppointments] = useState([]);
+  const [medicalOrders, setMedicalOrders] = useState([]);        // NEW
   const [transactionId, setTransactionId] = useState("");
   const [payingFor, setPayingFor] = useState(null);
+  const [payingForOrder, setPayingForOrder] = useState(null);    // NEW
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,6 +44,10 @@ const PatientDashboard = () => {
 
         const appointmentsRes = await axios.get('http://localhost:5000/api/appointments/my-appointments', { headers });
         setAppointments(appointmentsRes.data);
+
+        // === NEW: Fetch Medical Shop Orders ===
+        const ordersRes = await axios.get('http://localhost:5000/api/shop/my-orders', { headers });
+        setMedicalOrders(ordersRes.data);
 
       } catch (err) {
         console.error("Error fetching dashboard data");
@@ -90,6 +97,40 @@ const PatientDashboard = () => {
     }
   };
 
+  // === NEW: Handle Medical Order Payment ===
+  const handleOrderPaymentSubmit = async (orderId) => {
+    if (!transactionId) return alert("Please enter a Transaction ID");
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(`http://localhost:5000/api/shop/submit-transaction/${orderId}`, 
+        { transactionNumber: transactionId }, 
+        { headers: { Authorization: `Bearer ${token}` }}
+      );
+      alert("Payment Details Sent! Waiting for Admin verification.");
+      setPayingForOrder(null);
+      setTransactionId("");
+
+      // Refresh orders
+      const res = await axios.get('http://localhost:5000/api/shop/my-orders', { 
+        headers: { Authorization: `Bearer ${token}` } 
+      });
+      setMedicalOrders(res.data);
+    } catch (err) {
+      alert("Payment submission failed");
+    }
+  };
+
+  // === NEW: Map Order Status to Badge ===
+  const mapOrderStatus = (status) => {
+    const map = {
+      booked: "Pending",
+      awaiting_payment: "DoctorApproved",
+      verifying: "Paid",
+      confirmed: "Confirmed"
+    };
+    return map[status] || status;
+  };
+
   if (loading) return <div className="p-20 text-center">Loading Dashboard...</div>;
 
   return (
@@ -127,9 +168,8 @@ const PatientDashboard = () => {
             <div className="flex flex-wrap gap-3 justify-end">
               {!isEditing ? (
                 <>
-                  {/* --- NEW MEDICAL HISTORY BUTTON --- */}
                   <button 
-                    onClick={() => navigate('/patientRecords')} // Replace with your actual path
+                    onClick={() => navigate('/patientRecords')}
                     className="flex items-center gap-2 bg-indigo-50 text-indigo-600 px-5 py-2 rounded-xl text-sm font-bold hover:bg-indigo-100 transition border border-indigo-100"
                   >
                     <Clock size={16} /> My Medical History
@@ -254,8 +294,87 @@ const PatientDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* === NEW SECTION: MEDICAL SHOP ORDERS === */}
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
+          <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+            <ShoppingBag size={20} className="text-indigo-600"/> Medical Shop Purchases
+          </h2>
+          
+          <div className="space-y-4">
+            {medicalOrders.length === 0 ? (
+              <div className="text-center py-10 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                <p className="text-slate-400 text-sm">No medical purchases yet.</p>
+              </div>
+            ) : (
+              medicalOrders.map((order) => (
+                <div key={order._id} className="p-5 bg-slate-50 rounded-2xl border border-slate-100 hover:border-indigo-200 transition-colors">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 bg-white rounded-xl text-indigo-600 shadow-sm border border-slate-50">
+                        <ShoppingBag size={24} />
+                      </div>
+                      <div>
+                        <p className="font-bold text-lg text-slate-800">{order.itemId?.name || 'Medical Item'}</p>
+                        <p className="text-slate-600 font-medium">${order.itemId?.price}</p>
+                        <div className="flex gap-4 text-sm text-slate-500 mt-1">
+                          <span className="flex items-center gap-1">
+                            <Clock size={14}/> {new Date(order.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-4 md:mt-0 flex flex-col items-end gap-2">
+                      <StatusBadge status={mapOrderStatus(order.status)} />
+                      
+                      {(order.status === 'booked' || order.status === 'awaiting_payment') && (
+                        <button 
+                          onClick={() => setPayingForOrder(payingForOrder === order._id ? null : order._id)}
+                          className="bg-indigo-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700 flex items-center gap-2"
+                        >
+                          <CreditCard size={14} /> 
+                          {payingForOrder === order._id ? "Close" : "Pay Now"}
+                        </button>
+                      )}
+
+                      {order.status === 'confirmed' && (
+                        <span className="text-emerald-600 text-xs font-bold flex items-center gap-1">
+                          <CheckCircle size={14} /> Confirmed
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {payingForOrder === order._id && (
+                    <div className="mt-4 pt-4 border-t border-slate-200 animate-in fade-in slide-in-from-top-2">
+                      <p className="text-xs font-bold text-slate-500 uppercase mb-2">Submit Transaction Details</p>
+                      <div className="flex gap-2">
+                        <input 
+                          type="text" 
+                          placeholder="Enter Transaction ID" 
+                          className="flex-1 p-2 bg-white border rounded-xl outline-none text-sm focus:ring-2 focus:ring-indigo-500"
+                          value={transactionId}
+                          onChange={(e) => setTransactionId(e.target.value)}
+                        />
+                        <button 
+                          onClick={() => handleOrderPaymentSubmit(order._id)}
+                          className="bg-slate-900 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-indigo-600 transition"
+                        >
+                          Submit
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
       
-      {/* SECTION 3: CHATBOT moved out of the loop */}
+      {/* SECTION 3: CHATBOT */}
       <Chatbot />
     </div>
   );
