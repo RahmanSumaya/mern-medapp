@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { User, Mail, Phone, MapPin, Calendar, Edit2, Check, X, Clock, Stethoscope, LogOut, CreditCard, Video, ExternalLink, ArrowLeft } from 'lucide-react';
 import Chatbot from './Chatbot';
-
 const StatusBadge = ({ status }) => {
   const styles = {
     Pending: "bg-amber-100 text-amber-700 border-amber-200",

@@ -16,12 +16,14 @@ import DatasetLibrary from './pages/datasetLibrary';
 import DoctorPatientView from './pages/DoctorPatientView';
 import PatientRecords from './pages/PatientRecords';
 import AboutUs from './pages/Aboutus';
+import PatientAmbulance from './pages/PatientAmbulance';
+import MarketPlace from './pages/MarketPlace'
 
 // --- PROTECTED ROUTE COMPONENT ---
 const ProtectedRoute = ({ children, allowedRole }) => {
   const token = localStorage.getItem('token');
   const userRole = localStorage.getItem('role'); // Get role saved during login
-
+  
   if (!token) {
     return <Navigate to="/login" />;
   }
@@ -39,6 +41,8 @@ function App() {
     <Router>
       <Routes>
         {/* Public Routes */}
+        <Route path="/PatientAmbulance" element={<PatientAmbulance/>} />
+        <Route path="/MarketPlace" element={<MarketPlace/>} />
         <Route path="/" element={<Home />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} /> 
