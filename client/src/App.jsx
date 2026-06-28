@@ -16,11 +16,18 @@ import DatasetLibrary from './pages/datasetLibrary';
 import DoctorPatientView from './pages/DoctorPatientView';
 import PatientRecords from './pages/PatientRecords';
 import AboutUs from './pages/Aboutus';
+import PatientAmbulance from './pages/PatientAmbulance';
+import MarketPlace from './pages/MarketPlace'
 
 const ProtectedRoute = ({ children, allowedRole }) => {
   const token = localStorage.getItem('token');
+<<<<<<< HEAD
   const userRole = localStorage.getItem('role'); 
 
+=======
+  const userRole = localStorage.getItem('role'); // Get role saved during login
+  
+>>>>>>> 0c08a631ccc7b8c4c729b71774945813eef66726
   if (!token) {
     return <Navigate to="/login" />;
   }
@@ -36,6 +43,12 @@ function App() {
   return (
     <Router>
       <Routes>
+<<<<<<< HEAD
+=======
+        {/* Public Routes */}
+        <Route path="/PatientAmbulance" element={<PatientAmbulance/>} />
+        <Route path="/MarketPlace" element={<MarketPlace/>} />
+>>>>>>> 0c08a631ccc7b8c4c729b71774945813eef66726
         <Route path="/" element={<Home />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} /> 

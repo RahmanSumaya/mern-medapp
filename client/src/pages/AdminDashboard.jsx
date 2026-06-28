@@ -6,11 +6,9 @@ import {
   LogOut,
   LayoutDashboard,
   Calendar,
-  CheckCircle,
-  Video,
-  Link as LinkIcon,
-  Hash,
-  Database, // Added this import
+  Database,
+  Truck,        // Added for Ambulance
+  ShoppingBag,  // Added for Medical Shop
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -30,7 +28,7 @@ const AdminDashboard = () => {
         <div className="p-6 text-2xl font-bold border-b border-slate-800 text-indigo-400">
           Sumtasina Admin
         </div>
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           <button
             onClick={() => setActiveTab("overview")}
             className={`w-full flex items-center gap-3 p-3 rounded-lg transition ${
@@ -67,7 +65,10 @@ const AdminDashboard = () => {
             <BookOpen size={20} /> Create Article
           </button>
 
+<<<<<<< HEAD
    
+=======
+>>>>>>> 0c08a631ccc7b8c4c729b71774945813eef66726
           <button
             onClick={() => setActiveTab("dataset")}
             className={`w-full flex items-center gap-3 p-3 rounded-lg transition ${
@@ -75,6 +76,25 @@ const AdminDashboard = () => {
             }`}
           >
             <Database size={20} /> Dataset
+          </button>
+
+          {/* NEW SIDEBAR BUTTONS */}
+          <button
+            onClick={() => setActiveTab("ambulance")}
+            className={`w-full flex items-center gap-3 p-3 rounded-lg transition ${
+              activeTab === "ambulance" ? "bg-indigo-600" : "hover:bg-slate-800"
+            }`}
+          >
+            <Truck size={20} /> Ambulance Config
+          </button>
+
+          <button
+            onClick={() => setActiveTab("medicalshop")}
+            className={`w-full flex items-center gap-3 p-3 rounded-lg transition ${
+              activeTab === "medicalshop" ? "bg-indigo-600" : "hover:bg-slate-800"
+            }`}
+          >
+            <ShoppingBag size={20} /> Medical Shop Mgr
           </button>
         </nav>
 
@@ -93,6 +113,10 @@ const AdminDashboard = () => {
         {activeTab === "doctor" && <AddDoctorForm />}
         {activeTab === "article" && <AddArticleForm />}
         {activeTab === "dataset" && <AdminDatasetManager />}
+        
+        {/* NEW VIEWS */}
+        {activeTab === "ambulance" && <AdminAmbulanceManager />}
+        {activeTab === "medicalshop" && <AdminMedicalShopManager />}
       </div>
     </div>
   );
@@ -334,13 +358,8 @@ const AddDoctorForm = () => {
 
   return (
     <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 max-w-2xl">
-      <h2 className="text-2xl font-bold mb-6 text-slate-800">
-        Register New Doctor
-      </h2>
-      <form
-        onSubmit={handleSubmit}
-        className="grid grid-cols-1 md:grid-cols-2 gap-4"
-      >
+      <h2 className="text-2xl font-bold mb-6 text-slate-800">Register New Doctor</h2>
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <input
           type="text"
           placeholder="Full Name"
@@ -370,36 +389,28 @@ const AddDoctorForm = () => {
           placeholder="Specialization"
           className="p-3 border rounded-xl bg-slate-50"
           value={docData.specialization}
-          onChange={(e) =>
-            setDocData({ ...docData, specialization: e.target.value })
-          }
+          onChange={(e) => setDocData({ ...docData, specialization: e.target.value })}
         />
         <input
           type="number"
           placeholder="Experience (Years)"
           className="p-3 border rounded-xl bg-slate-50"
           value={docData.experience}
-          onChange={(e) =>
-            setDocData({ ...docData, experience: e.target.value })
-          }
+          onChange={(e) => setDocData({ ...docData, experience: e.target.value })}
         />
         <input
           type="text"
           placeholder="Hospital Name"
           className="p-3 border rounded-xl bg-slate-50"
           value={docData.hospitalName}
-          onChange={(e) =>
-            setDocData({ ...docData, hospitalName: e.target.value })
-          }
+          onChange={(e) => setDocData({ ...docData, hospitalName: e.target.value })}
         />
         <input
           type="number"
           placeholder="Hourly Rate ($)"
           className="p-3 border rounded-xl bg-slate-50"
           value={docData.hourlyRate}
-          onChange={(e) =>
-            setDocData({ ...docData, hourlyRate: e.target.value })
-          }
+          onChange={(e) => setDocData({ ...docData, hourlyRate: e.target.value })}
         />
         <input
           type="text"
@@ -422,6 +433,10 @@ const AddDoctorForm = () => {
   );
 };
 
+<<<<<<< HEAD
+=======
+// --- SUB-COMPONENT: ADD ARTICLE FORM ---
+>>>>>>> 0c08a631ccc7b8c4c729b71774945813eef66726
 const AddArticleForm = () => {
   const [article, setArticle] = useState({
     title: "",
@@ -468,9 +483,7 @@ const AddArticleForm = () => {
 
   return (
     <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 max-w-4xl mx-auto">
-      <h2 className="text-2xl font-bold text-slate-800 mb-6">
-        Create Health Article
-      </h2>
+      <h2 className="text-2xl font-bold text-slate-800 mb-6">Create Health Article</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <input
@@ -490,7 +503,10 @@ const AddArticleForm = () => {
             required
           />
         </div>
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0c08a631ccc7b8c4c729b71774945813eef66726
         <input
           name="imageUrl"
           value={article.imageUrl}
@@ -498,8 +514,6 @@ const AddArticleForm = () => {
           placeholder="Header Image URL (https://...)"
           className={inputClasses}
         />
-
-        {/* Row 3: Main Content */}
         <textarea
           name="content"
           value={article.content}
@@ -509,7 +523,10 @@ const AddArticleForm = () => {
           className={inputClasses}
           required
         />
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0c08a631ccc7b8c4c729b71774945813eef66726
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <textarea
             name="symptoms"
@@ -536,7 +553,10 @@ const AddArticleForm = () => {
             rows="3"
           />
         </div>
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0c08a631ccc7b8c4c729b71774945813eef66726
         <button
           type="submit"
           disabled={loading}
@@ -548,4 +568,236 @@ const AddArticleForm = () => {
     </div>
   );
 };
+
+// --- NEW FEATURE 1 SUB-COMPONENT: AMBULANCE CONFIG MANAGER ---
+const AdminAmbulanceManager = () => {
+  const [driver, setDriver] = useState({ driverName: "", driverNumber: "", district: "" });
+
+  const handleAddAmbulance = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post("http://localhost:5000/api/admin/add-ambulance", driver, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert("Ambulance Driver Configured Successfully!");
+      setDriver({ driverName: "", driverNumber: "", district: "" });
+    } catch (err) {
+      alert("Failed to configure ambulance service.");
+    }
+  };
+
+  return (
+    <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 max-w-xl">
+      <h2 className="text-2xl font-bold mb-6 text-slate-800">Configure Emergency Ambulance Driver</h2>
+      <form onSubmit={handleAddAmbulance} className="space-y-4">
+        <input
+          type="text"
+          placeholder="Driver Full Name"
+          className="p-3 border rounded-xl w-full bg-slate-50"
+          value={driver.driverName}
+          onChange={(e) => setDriver({ ...driver, driverName: e.target.value })}
+          required
+        />
+        <input
+          type="text"
+          placeholder="Driver Mobile Number"
+          className="p-3 border rounded-xl w-full bg-slate-50"
+          value={driver.driverNumber}
+          onChange={(e) => setDriver({ ...driver, driverNumber: e.target.value })}
+          required
+        />
+        <input
+          type="text"
+          placeholder="District Area (e.g. Dhaka, Chittagong)"
+          className="p-3 border rounded-xl w-full bg-slate-50"
+          value={driver.district}
+          onChange={(e) => setDriver({ ...driver, district: e.target.value })}
+          required
+        />
+        <button className="w-full bg-indigo-600 text-white p-3 rounded-xl font-bold hover:bg-indigo-700 transition">
+          Add Driver Profile
+        </button>
+      </form>
+    </div>
+  );
+};
+
+// --- NEW FEATURE 2 SUB-COMPONENT: MEDICAL SHOP & ORDERS MANAGER ---
+const AdminMedicalShopManager = () => {
+  const [item, setItem] = useState({ name: "", type: "medicine", price: "", description: "" });
+  const [orders, setOrders] = useState([]);
+
+  const fetchOrders = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get("http://localhost:5000/api/admin/shop-orders", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setOrders(res.data);
+    } catch (err) {
+      console.error("Error retrieving medical records shop workflows");
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const handleAddItem = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post("http://localhost:5000/api/admin/add-shop-item", item, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert("Product successfully added to inventory catalog!");
+      setItem({ name: "", type: "medicine", price: "", description: "" });
+    } catch (err) {
+      alert("Inventory sync error.");
+    }
+  };
+
+  const requestPayment = async (orderId) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put(`http://localhost:5000/api/admin/order/request-payment/${orderId}`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert("Notification sent requesting payment verification from user.");
+      fetchOrders();
+    } catch (err) {
+      alert("Failed to request payment confirmation.");
+    }
+  };
+
+  const confirmOrder = async (orderId) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put(`http://localhost:5000/api/admin/order/confirm/${orderId}`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert("Transaction verified! Purchase lifecycle successfully closed.");
+      fetchOrders();
+    } catch (err) {
+      alert("Error approving transaction confirmation token.");
+    }
+  };
+
+  return (
+    <div className="space-y-8">
+      {/* SECTION A: ADD ITEM */}
+      <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 max-w-xl">
+        <h2 className="text-2xl font-bold mb-6 text-slate-800">Add Product to Medical Inventory</h2>
+        <form onSubmit={handleAddItem} className="space-y-4">
+          <input
+            type="text"
+            placeholder="Product / Item Name"
+            className="p-3 border rounded-xl w-full bg-slate-50"
+            value={item.name}
+            onChange={(e) => setItem({ ...item, name: e.target.value })}
+            required
+          />
+          <select
+            className="p-3 border rounded-xl w-full bg-slate-50"
+            value={item.type}
+            onChange={(e) => setItem({ ...item, type: e.target.value })}
+          >
+            <option value="medicine">Medicine</option>
+            <option value="book">Medical Book</option>
+            <option value="organ">Organ Allocation</option>
+          </select>
+          <input
+            type="number"
+            placeholder="Fixed Price ($)"
+            className="p-3 border rounded-xl w-full bg-slate-50"
+            value={item.price}
+            onChange={(e) => setItem({ ...item, price: e.target.value })}
+            required
+          />
+          <textarea
+            placeholder="Description specs"
+            className="p-3 border rounded-xl w-full bg-slate-50 h-24"
+            value={item.description}
+            onChange={(e) => setItem({ ...item, description: e.target.value })}
+          />
+          <button className="w-full bg-indigo-600 text-white p-3 rounded-xl font-bold hover:bg-indigo-700 transition">
+            Publish Item
+          </button>
+        </form>
+      </div>
+
+      {/* SECTION B: ORDER PIPELINE SYSTEM */}
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+        <h2 className="text-2xl font-bold mb-6 text-slate-800">Medical Purchase Order Tracking Pipeline</h2>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b text-slate-400 text-sm">
+                <th className="pb-3 px-2">Patient Details</th>
+                <th className="pb-3 px-2">Item Specs</th>
+                <th className="pb-3 px-2">Txn Token</th>
+                <th className="pb-3 px-2">Workflow State</th>
+                <th className="pb-3 px-2">Action Handle</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.map((order) => (
+                <tr key={order._id} className="border-b last:border-0 hover:bg-slate-50">
+                  <td className="py-4 px-2 text-sm">
+                    <div className="font-medium">{order.patientId?.name || "Unknown Patient"}</div>
+                    <div className="text-xs text-slate-400">{order.patientId?.email}</div>
+                  </td>
+                  <td className="py-4 px-2 text-sm">
+                    <div className="font-medium">{order.itemId?.name}</div>
+                    <div className="text-xs text-indigo-500 font-bold">${order.itemId?.price} ({order.itemId?.type})</div>
+                  </td>
+                  <td className="py-4 px-2 text-sm font-mono text-slate-600">
+                    {order.transactionNumber || <span className="text-slate-400 italic">None Supplied</span>}
+                  </td>
+                  <td className="py-4 px-2">
+                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${
+                      order.status === 'booked' ? 'bg-blue-100 text-blue-700' :
+                      order.status === 'awaiting_payment' ? 'bg-yellow-100 text-yellow-700' :
+                      order.status === 'verifying' ? 'bg-purple-100 text-purple-700 animate-pulse' :
+                      'bg-green-100 text-green-700'
+                    }`}>
+                      {order.status.replace('_', ' ')}
+                    </span>
+                  </td>
+                  <td className="py-4 px-2">
+                    {order.status === 'booked' && (
+                      <button
+                        onClick={() => requestPayment(order._id)}
+                        className="bg-amber-500 text-white px-3 py-1 rounded-lg text-xs font-bold hover:bg-amber-600 shadow-sm"
+                      >
+                        Request Payment
+                      </button>
+                    )}
+                    {order.status === 'verifying' && (
+                      <button
+                        onClick={() => confirmOrder(order._id)}
+                        className="bg-emerald-600 text-white px-3 py-1 rounded-lg text-xs font-bold hover:bg-emerald-700 shadow-sm"
+                      >
+                        Verify & Confirm
+                      </button>
+                    )}
+                    {order.status === 'awaiting_payment' && (
+                      <span className="text-xs text-slate-400 italic">Waiting for Patient Txn</span>
+                    )}
+                    {order.status === 'confirmed' && (
+                      <span className="text-xs text-emerald-500 font-bold">Closed Successfully</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default AdminDashboard;
+
