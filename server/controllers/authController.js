@@ -2,8 +2,8 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-// 1. SIGNUP
-exports.signup = async (req, res) => { // Removed 'next'
+
+exports.signup = async (req, res) => { 
   try {
     const { name, email, password } = req.body;
 
@@ -26,7 +26,7 @@ exports.signup = async (req, res) => { // Removed 'next'
 };
 
 // 2. LOGIN
-exports.login = async (req, res) => { // Removed 'next'
+exports.login = async (req, res) => { 
   const { email, password } = req.body;
 
   try {
@@ -62,10 +62,8 @@ exports.login = async (req, res) => { // Removed 'next'
   }
 };
 
-// 3. GET CURRENT USER
-exports.getMe = async (req, res) => { // Removed 'next'
+exports.getMe = async (req, res) => { 
   try {
-    // Check if req.user exists (from protect middleware)
     if (!req.user || !req.user.id) {
         return res.status(401).json({ msg: "Not authorized" });
     }
@@ -79,10 +77,8 @@ exports.getMe = async (req, res) => { // Removed 'next'
   }
 };
 
-// 4. UPDATE PROFILE
 exports.updateProfile = async (req, res) => {
   try {
-    // Destructure all possible fields
     const { 
       name, phone, address, gender, dob, profilePic, 
       specialization, hourlyRate, experience, hospitalName, about, education 
@@ -93,7 +89,6 @@ exports.updateProfile = async (req, res) => {
       specialization, hourlyRate, experience, hospitalName, about, education 
     };
 
-    // Remove undefined fields so we don't overwrite with null
     Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
 
     const updatedUser = await User.findByIdAndUpdate(
@@ -107,7 +102,6 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({ msg: "Server Error", error: err.message });
   }
 };
-// controllers/authController.js
 exports.getDoctorProfile = async (req, res) => {
   try {
     const doctor = await User.findById(req.user.id).select('-password');

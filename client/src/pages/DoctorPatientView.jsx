@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { FileText, User } from 'lucide-react';
 
 const DoctorPatientView = () => {
-  const { patientId } = useParams(); // Get ID from URL
+  const { patientId } = useParams(); 
   const [records, setRecords] = useState([]);
 
   useEffect(() => {

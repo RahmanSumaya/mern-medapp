@@ -9,7 +9,6 @@ const DatasetLibrary = () => {
   useEffect(() => {
     const fetchPublicDataset = async () => {
       try {
-        // This hits your public GET route that only returns status: 'Approved'
         const res = await axios.get("http://localhost:5000/api/dataset/public_dataset");
         setDataset(res.data);
       } catch (err) {
@@ -35,7 +34,6 @@ const DatasetLibrary = () => {
   return (
     <div className="min-h-screen bg-slate-50 p-8">
       <div className="max-w-6xl mx-auto">
-        {/* HEADER SECTION */}
         <header className="mb-12 text-center">
           <div className="flex justify-center mb-4">
             <div className="p-3 bg-indigo-600 text-white rounded-2xl shadow-lg">
@@ -56,7 +54,6 @@ const DatasetLibrary = () => {
           </div>
         </header>
 
-        {/* DATASET GRID */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredDataset.map((ds) => (
             <div key={ds._id} className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group">

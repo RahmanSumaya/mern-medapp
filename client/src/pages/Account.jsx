@@ -5,7 +5,7 @@ import { User, Stethoscope } from 'lucide-react';
 const Home = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col items-center justify-center p-6">
-      {/* Hero Section */}
+    
       <div className="text-center mb-12">
         <h1 className="text-5xl font-extrabold text-blue-900 mb-4">
           Sumtasina
@@ -15,9 +15,8 @@ const Home = () => {
         </p>
       </div>
 
-      {/* Action Buttons */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-2xl">
-        {/* Sign Up Card */}
+      
         <Link to="/signup" 
   className="group bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all border-2 border-transparent hover:border-blue-500 text-left block"
 >
@@ -29,7 +28,6 @@ const Home = () => {
   <div className="mt-4 text-blue-600 font-semibold">Sign Up Now →</div>
 </Link>
 
-        {/* Login Card */}
         <Link 
   to="/login" 
   className="group bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all border-2 border-transparent hover:border-indigo-500 text-left block"

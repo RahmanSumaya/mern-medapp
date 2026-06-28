@@ -107,7 +107,6 @@ const PatientDashboard = () => {
         </button>
       </div>
 
-      {/* SECTION 1: PROFILE CARD */}
       <div className="max-w-4xl mx-auto bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
         <div className="h-32 bg-gradient-to-r from-blue-600 to-indigo-600 relative">
           <div className="absolute -bottom-12 left-8">
@@ -128,9 +127,9 @@ const PatientDashboard = () => {
             <div className="flex flex-wrap gap-3 justify-end">
               {!isEditing ? (
                 <>
-                  {/* --- NEW MEDICAL HISTORY BUTTON --- */}
+                  
                   <button 
-                    onClick={() => navigate('/patientRecords')} // Replace with your actual path
+                    onClick={() => navigate('/patientRecords')} 
                     className="flex items-center gap-2 bg-indigo-50 text-indigo-600 px-5 py-2 rounded-xl text-sm font-bold hover:bg-indigo-100 transition border border-indigo-100"
                   >
                     <Clock size={16} /> My Medical History
@@ -175,7 +174,6 @@ const PatientDashboard = () => {
         </div>
       </div>
 
-      {/* SECTION 2: APPOINTMENT LIST */}
       <div className="max-w-4xl mx-auto">
         <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
           <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
@@ -255,8 +253,6 @@ const PatientDashboard = () => {
           </div>
         </div>
       </div>
-      
-      {/* SECTION 3: CHATBOT moved out of the loop */}
       <Chatbot />
     </div>
   );

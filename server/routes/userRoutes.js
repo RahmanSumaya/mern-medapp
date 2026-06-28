@@ -3,10 +3,8 @@ const router = express.Router();
 const User = require('../models/User');
 const { protect } = require('../middleware/authMiddleware');
 
-// @route   GET api/users/profile
 router.get('/profile', protect, async (req, res) => {
   try {
-    // Check if req.user exists from the protect middleware
     if (!req.user || !req.user.id) {
       return res.status(401).json({ msg: "User ID missing from token" });
     }
@@ -21,7 +19,6 @@ router.get('/profile', protect, async (req, res) => {
   }
 });
 
-// @route   PUT api/users/profile
 router.put('/profile', protect, async (req, res) => {
   try {
     const { name, phone, address, profilePic, specialization, hourlyRate } = req.body;

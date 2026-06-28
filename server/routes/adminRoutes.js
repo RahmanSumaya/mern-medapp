@@ -4,7 +4,6 @@ const { protect, authorize } = require('../middleware/authMiddleware');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 
-// Only Admin can create a Doctor
 router.post('/add-doctor', protect, authorize('admin'), async (req, res) => {
   try {
     const { name, email, password, specialization, address, phone, hourlyRate, experience, hospitalName, about, education } = req.body;
@@ -26,7 +25,6 @@ router.post('/add-doctor', protect, authorize('admin'), async (req, res) => {
   }
 });
 
-// ADD THIS NEW ROUTE: Get single doctor by ID
 router.get('/doctor/:id', async (req, res) => {
   try {
     const doctor = await User.findById(req.params.id).select('-password');
@@ -36,12 +34,9 @@ router.get('/doctor/:id', async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
-// URL: GET http://localhost:5000/api/admin/doctors
-// This lets anyone (or just Admin/Users) see the list of doctors
 router.get('/doctors', async (req, res) => {
   try {
     const doctors = await User.find({ role: 'doctor' }).select('-password'); 
-    // .select('-password') hides the password for security!
     res.json(doctors);
   } catch (err) {
     res.status(500).send("Server Error");

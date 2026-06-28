@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // 1. Added this
+import { useNavigate } from 'react-router-dom'; 
 import { Search, BookOpen, ChevronRight } from 'lucide-react';
 
 const HealthLibrary = () => {
   const [articles, setArticles] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate(); // 2. Initialize navigate
+  const navigate = useNavigate(); 
 
-  // Fetch articles from backend
   useEffect(() => {
     const fetchArticles = async () => {
       try {
@@ -31,7 +30,6 @@ const HealthLibrary = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 pb-20">
-      {/* Header Section */}
       <div className="bg-indigo-900 text-white py-16 px-6 text-center">
         <h1 className="text-4xl font-bold mb-4">Medical Knowledge Base</h1>
         <p className="text-indigo-200 max-w-2xl mx-auto">
@@ -49,7 +47,6 @@ const HealthLibrary = () => {
         </div>
       </div>
 
-      {/* Articles Grid */}
       <div className="max-w-7xl mx-auto px-6 mt-12">
         {loading ? (
           <div className="text-center py-20">Loading articles...</div>

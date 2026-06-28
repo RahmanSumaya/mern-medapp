@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-// 1. Ensure Link is imported
 import { useParams, useNavigate, Link } from 'react-router-dom'; 
 import axios from 'axios';
 import { 
@@ -57,7 +56,6 @@ const DoctorDetails = () => {
         <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden border border-slate-100">
           <div className="flex flex-col md:flex-row">
             
-            {/* LEFT COLUMN: Sidebar Profile */}
             <div className="md:w-1/3 bg-indigo-600 p-8 text-white text-center flex flex-col items-center">
               <div className="w-48 h-48 bg-white rounded-3xl mb-6 p-1 shadow-2xl relative">
                 <img 
@@ -91,7 +89,6 @@ const DoctorDetails = () => {
               </div>
             </div>
 
-            {/* RIGHT COLUMN: Detailed Info */}
             <div className="md:w-2/3 p-8 md:p-12 lg:p-16">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12">
                 <div className="flex items-center gap-4 p-5 bg-blue-50 rounded-2xl border border-blue-100">
@@ -134,7 +131,6 @@ const DoctorDetails = () => {
                   </div>
                 </section>
 
-                {/* 2. UPDATE: Main Action Button - Connected to Routing */}
                 <Link to={`/book-appointment/${doctor._id}`}>
                   <button className="w-full bg-indigo-600 text-white py-5 rounded-[1.5rem] font-black text-xl hover:bg-slate-900 transition-all shadow-2xl shadow-indigo-200 active:scale-95">
                     BOOK AN APPOINTMENT

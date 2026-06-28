@@ -14,19 +14,17 @@ const BookAppointment = () => {
   const timeSlots = ["10:00 AM", "11:00 AM", "12:00 PM", "03:00 PM", "04:00 PM", "05:00 PM"];
 
   useEffect(() => {
-    // 1. Generate dynamic dates (Today + 6 following days)
     const dates = [];
     for (let i = 0; i < 7; i++) {
       const d = new Date();
       d.setDate(d.getDate() + i);
       dates.push({
-        full: d.toISOString().split('T')[0], // YYYY-MM-DD
+        full: d.toISOString().split('T')[0], 
         display: d.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' })
       });
     }
     setAvailableDates(dates);
 
-    // 2. Fetch Doctor Info
     const fetchDoc = async () => {
       const res = await axios.get(`http://localhost:5000/api/admin/doctor/${doctorId}`);
       setDoctor(res.data);
@@ -85,7 +83,6 @@ const BookAppointment = () => {
             </div>
           </div>
 
-          {/* TIME SELECTION */}
           <div>
             <label className="flex items-center gap-2 text-slate-700 font-bold mb-4"><Clock size={18}/> Select Time</label>
             <div className="grid grid-cols-3 gap-2">

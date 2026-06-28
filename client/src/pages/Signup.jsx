@@ -7,7 +7,7 @@ const Signup = () => {
     name: '',
     email: '',
     password: '',
-    role: 'user' // Default role
+    role: 'user' 
   });
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ const Signup = () => {
       const res = await axios.post('http://localhost:5000/api/auth/signup', formData);
       console.log('User Registered:', res.data);
       alert('Signup Successful! Please Login.');
-      navigate('/login'); // Redirect to login after success
+      navigate('/login'); 
     } catch (err) {
       setError(err.response?.data?.msg || 'Signup failed. Try again.');
     }

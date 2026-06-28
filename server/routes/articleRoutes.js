@@ -2,9 +2,6 @@ const express = require('express');
 const router = express.Router();
 const Article = require('../models/Article');
 const { protect, authorize } = require('../middleware/authMiddleware');
-
-// @route   POST api/articles
-// @desc    Admin adds a new disease article
 router.post('/', protect, authorize('admin'), async (req, res) => {
   try {
     const { title, diseaseName, content, symptoms, prevention, treatments, imageUrl, source } = req.body;
@@ -28,17 +25,12 @@ router.post('/', protect, authorize('admin'), async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
-
-// @route   GET api/articles
-// @desc    Get all articles OR search by disease name
 router.get('/', async (req, res) => {
   try {
     const { search } = req.query;
     let query = {};
-
-    // If the user types something in the search bar
     if (search) {
-      query = { diseaseName: { $regex: search, $options: 'i' } }; // 'i' makes it case-insensitive
+      query = { diseaseName: { $regex: search, $options: 'i' } }; 
     }
 
     const articles = await Article.find(query).sort({ createdAt: -1 });
@@ -47,14 +39,13 @@ router.get('/', async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
-// @route   PUT api/articles/:id
-// @desc    Admin can edit an existing article
+
 router.put('/:id', protect, authorize('admin'), async (req, res) => {
   try {
     const updatedArticle = await Article.findByIdAndUpdate(
       req.params.id,
-      { $set: req.body }, // Updates only the fields you send in Postman
-      { new: true }       // Returns the updated version of the article
+      { $set: req.body }, 
+      { new: true }       
     );
 
     if (!updatedArticle) return res.status(404).json({ msg: 'Article not found' });
@@ -65,9 +56,6 @@ router.put('/:id', protect, authorize('admin'), async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
-
-// @route   DELETE api/articles/:id
-// @desc    Admin can delete an article
 router.delete('/:id', protect, authorize('admin'), async (req, res) => {
   try {
     const article = await Article.findById(req.params.id);

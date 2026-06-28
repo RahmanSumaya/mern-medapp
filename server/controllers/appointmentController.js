@@ -1,7 +1,6 @@
 const Appointment = require('../models/Appointment');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-// 1. GET appointments for the logged-in PATIENT
 const getMyAppointments = async (req, res) => {
   try {
     const appointments = await Appointment.find({ user: req.user.id })
@@ -13,7 +12,6 @@ const getMyAppointments = async (req, res) => {
   }
 };
 
-// 2. GET appointments for the logged-in DOCTOR
 const getDoctorRequests = async (req, res) => {
   try {
     const appointments = await Appointment.find({ doctor: req.user.id })
@@ -25,12 +23,10 @@ const getDoctorRequests = async (req, res) => {
   }
 };
 
-// 3. ENHANCED Booking
 const bookAppointment = async (req, res) => {
   try {
     const { doctorId, date, time } = req.body;
 
-    // Check if req.user exists (from authMiddleware)
     if (!req.user || !req.user.id) {
       return res.status(401).json({ message: "User not authenticated correctly" });
     }
@@ -46,24 +42,22 @@ const bookAppointment = async (req, res) => {
       return res.status(400).json({ message: "This time slot is already booked." });
     }
 
-    // Explicitly create the object
     const newAppointment = new Appointment({
-      user: req.user.id, // Ensure your Model uses 'user' and NOT 'patient'
+      user: req.user.id, 
       doctor: doctorId,
       date: date,
       time: time,
-      status: 'Pending' // Explicitly set initial status
+      status: 'Pending'
     });
 
     const savedAppointment = await newAppointment.save();
     res.status(201).json({ message: "Request sent!", newAppointment: savedAppointment });
   } catch (error) {
-    console.error("Booking Error:", error); // Log this to your terminal to see the full error
+    console.error("Booking Error:", error); 
     res.status(500).json({ message: error.message });
   }
 };
 
-// 4. Doctor Approves Request
 const approveByDoctor = async (req, res) => {
   try {
     const appointment = await Appointment.findById(req.params.id);
@@ -77,18 +71,17 @@ const approveByDoctor = async (req, res) => {
   }
 };
 
-// 5. Admin Confirms Payment
-// Add/Update this function in your appointmentcontroller.js
+
 const confirmByAdmin = async (req, res) => {
   try {
-    const { meetingLink } = req.body; // Admin sends the link here
+    const { meetingLink } = req.body; 
 
     const appointment = await Appointment.findByIdAndUpdate(
       req.params.id,
       { 
         status: 'Confirmed',
         'paymentDetails.isPaid': true,
-        meetingLink: meetingLink // Save the link
+        meetingLink: meetingLink 
       },
       { new: true }
     );
@@ -116,7 +109,6 @@ const payAppointment = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-// Change from "exports.getAllAppointments =" to "const getAllAppointments ="
 const getAllAppointments = async (req, res) => {
   try {
     const appointments = await Appointment.find()
@@ -124,7 +116,6 @@ const getAllAppointments = async (req, res) => {
       .populate('doctor', 'name')
       .sort({ createdAt: -1 });
     
-    // Check if appointments exist (for debugging)
     console.log("Found appointments:", appointments.length);
     
     res.json(appointments);
@@ -133,7 +124,6 @@ const getAllAppointments = async (req, res) => {
     res.status(500).json({ message: "Server Error fetching all appointments" });
   }
 };
-// Ensure ALL functions are exported
 module.exports = { 
   bookAppointment, 
   getMyAppointments, 

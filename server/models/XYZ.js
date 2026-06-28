@@ -5,7 +5,7 @@ const datasetSchema = new mongoose.Schema({
   description: { type: String },
   fileUrl: { type: String, required: true },
   doctor: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  status: { type: String, default: 'Pending' }, // Pending, Approved
+  status: { type: String, default: 'Pending' }, 
   downloadCount: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now }
 });

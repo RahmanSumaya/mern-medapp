@@ -7,13 +7,11 @@ exports.downloadFile = async (req, res) => {
     if (!dataset || dataset.status !== 'Approved') {
       return res.status(404).json({ msg: "Dataset not available" });
     }
-
-    // Increment download count for analytics
     dataset.downloadCount += 1;
     await dataset.save();
 
     const filePath = path.join(__dirname, '..', dataset.fileUrl);
-    res.download(filePath); // This forces the browser to download the file
+    res.download(filePath); 
   } catch (err) {
     res.status(500).send("Error downloading file");
   }
@@ -27,7 +25,7 @@ exports.uploadDataset = async (req, res) => {
     const newDataset = new Dataset({
       title,
       description,
-      fileUrl: req.file.path, // Save the path to the file
+      fileUrl: req.file.path, 
       doctor: req.user.id
     });
 

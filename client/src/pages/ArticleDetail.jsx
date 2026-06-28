@@ -4,7 +4,7 @@ import axios from 'axios';
 import { ArrowLeft, Activity, ShieldCheck, Stethoscope } from 'lucide-react';
 
 const ArticleDetail = () => {
-  const { id } = useParams(); // Gets the ID from the URL
+  const { id } = useParams(); 
   const navigate = useNavigate();
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -12,10 +12,8 @@ const ArticleDetail = () => {
   useEffect(() => {
     const fetchArticle = async () => {
       try {
-        // We fetch the specific article by ID
         const res = await axios.get(`http://localhost:5000/api/articles`);
-        // Since your current GET route returns an array, we find the specific one.
-        // (Tip: Later you can make a backend route GET /api/articles/:id for better performance)
+     
         const found = res.data.find(a => a._id === id);
         setArticle(found);
       } catch (err) {
@@ -32,7 +30,6 @@ const ArticleDetail = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Header */}
       <div className="relative h-96 w-full overflow-hidden">
         <img 
           src={article.imageUrl || 'https://images.unsplash.com/photo-1576091160550-2173dba999ef'} 
@@ -55,14 +52,12 @@ const ArticleDetail = () => {
         </div>
       </div>
 
-      {/* Content Section */}
       <div className="max-w-4xl mx-auto px-6 py-12">
         <p className="text-xl text-slate-600 leading-relaxed mb-12 italic border-l-4 border-indigo-500 pl-6">
           {article.content}
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Symptoms */}
           <div className="bg-red-50 p-6 rounded-3xl border border-red-100">
             <h3 className="flex items-center gap-2 text-red-700 font-bold mb-4 text-lg">
               <Activity size={20} /> Symptoms
@@ -72,7 +67,6 @@ const ArticleDetail = () => {
             </p>
           </div>
 
-          {/* Prevention */}
           <div className="bg-green-50 p-6 rounded-3xl border border-green-100">
             <h3 className="flex items-center gap-2 text-green-700 font-bold mb-4 text-lg">
               <ShieldCheck size={20} /> Prevention
@@ -82,7 +76,6 @@ const ArticleDetail = () => {
             </p>
           </div>
 
-          {/* Treatments */}
           <div className="bg-blue-50 p-6 rounded-3xl border border-blue-100">
             <h3 className="flex items-center gap-2 text-blue-700 font-bold mb-4 text-lg">
               <Stethoscope size={20} /> Treatments

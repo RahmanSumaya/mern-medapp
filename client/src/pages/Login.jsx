@@ -14,16 +14,12 @@ const Login = () => {
     setLoading(true);
 
     try {
-      // Sending request to your login controller
       const res = await axios.post('http://localhost:5000/api/auth/login', formData);
       
-      // 1. Save data to localStorage (Matches your authController output)
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('role', res.data.user.role); 
       localStorage.setItem('userId', res.data.user.id);
       
-      // 2. Role-Based Redirection
-      // Note: We use 'user' here because your UserSchema defines the role as 'user' (patient)
       const userRole = res.data.user.role;
 
       if (userRole === 'admin') {
@@ -31,13 +27,12 @@ const Login = () => {
       } else if (userRole === 'doctor') {
         navigate('/dashboard_doctor');
       } else if (userRole === 'user') {
-        navigate('/dashboard'); // This is your Patient/User Dashboard
+        navigate('/dashboard'); 
       } else {
-        navigate('/'); // Fallback for safety
+        navigate('/'); 
       }
 
     } catch (err) {
-      // Displays the 'msg' from your controller: res.status(400).json({ msg: '...' })
       setError(err.response?.data?.msg || 'Invalid Email or Password');
     } finally {
       setLoading(false);
@@ -75,7 +70,7 @@ const Login = () => {
             <label className="text-[11px] font-bold text-slate-400 uppercase ml-2">Password</label>
             <input 
               type="password" 
-              placeholder="••••••••" 
+              placeholder="********" 
               required
               className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition-all placeholder:text-slate-300"
               onChange={(e) => setFormData({...formData, password: e.target.value})}

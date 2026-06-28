@@ -59,7 +59,6 @@ const DoctorDashboard = () => {
  const handleApprove = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      // Updated endpoint to match your routes/appointmentRotes.js
       await axios.put(`http://localhost:5000/api/appointments/approve/${id}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -81,7 +80,6 @@ const DoctorDashboard = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
-      {/* SIDEBAR */}
       <div className="w-64 bg-slate-900 text-white p-6 hidden md:block sticky top-0 h-screen shadow-2xl">
         <div className="mb-10 px-2">
             <h2 className="text-2xl font-black text-indigo-400 tracking-tighter">Sumtasina</h2>
@@ -110,10 +108,8 @@ const DoctorDashboard = () => {
         </nav>
       </div>
 
-      {/* MAIN CONTENT AREA */}
       <div className="flex-1 p-6 md:p-12 overflow-y-auto">
         
-        {/* TOP HEADER SECTION */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-10 gap-6">
           <div className="flex items-center gap-5">
             <img 
@@ -140,8 +136,6 @@ const DoctorDashboard = () => {
           </div>
         </div>
 
-       {/* APPOINTMENTS TAB */}
-        {/* APPOINTMENTS CONTENT */}
         {activeTab === 'appointments' && (
           <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
             <section className="bg-white p-8 rounded-[3rem] shadow-sm border border-slate-100">
@@ -168,7 +162,6 @@ const DoctorDashboard = () => {
                                   {app.user?.name || 'Unknown Patient'}
                               </p>
       
-      {/* IMPROVED NAVIGATION BUTTON */}
       <button 
         onClick={() => navigate(`/doctor/patient-history/${app.user?._id}`)}
         className="flex items-center gap-1 px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-all shadow-sm border border-indigo-100"
@@ -188,7 +181,6 @@ const DoctorDashboard = () => {
                         <div className="flex items-center gap-4">
                           <StatusBadge status={app.status} />
                           
-                          {/* DOCTOR APPROVAL BUTTON (Visible only when Pending) */}
                           {app.status === 'Pending' && (
                             <button 
                               onClick={() => handleApprove(app._id)}
@@ -198,7 +190,6 @@ const DoctorDashboard = () => {
                             </button>
                           )}
 
-                          {/* JOIN MEETING BUTTON (Visible only when Admin has provided it) */}
                           {app.status === 'Confirmed' && app.meetingLink && (
                             <a 
                               href={app.meetingLink} 
@@ -223,7 +214,6 @@ const DoctorDashboard = () => {
           </div>
         )}
         
-        {/* TAB CONTENT: DATASET UPLOAD */}
         {activeTab === 'upload' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
             <div className="lg:col-span-1">
@@ -271,7 +261,6 @@ const DoctorDashboard = () => {
           </div>
         )}
 
-        {/* TAB CONTENT: EDIT PROFILE */}
         {activeTab === 'profile' && (
           <EditDoctorProfile initialData={doctorData} onUpdate={fetchInitialData} />
         )}
@@ -281,7 +270,6 @@ const DoctorDashboard = () => {
   );
 };
 
-/* --- FORM COMPONENT: UPLOAD DATASET --- */
 const UploadDatasetForm = ({ onUploadSuccess }) => {
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState('');
@@ -303,8 +291,23 @@ const UploadDatasetForm = ({ onUploadSuccess }) => {
       setTitle(''); setFile(null);
       onUploadSuccess();
     } catch (err) {
-      alert("Upload failed.");
-    } finally { setUploading(false); }
+  console.error("FULL ERROR OBJECT:", err);
+  
+  // Extracting detailed messages from axios response if they exist
+  const backendMessage = err.response?.data?.msg || err.response?.data?.message;
+  const statusText = err.response?.statusText;
+  const statusCode = err.response?.status;
+
+  if (backendMessage) {
+    alert(`Upload failed: ${backendMessage} (Status: ${statusCode})`);
+  } else if (statusCode) {
+    alert(`Upload failed with status code ${statusCode}: ${statusText}`);
+  } else {
+    alert(`Upload failed: ${err.message}`);
+  }
+} finally { 
+  setUploading(false); 
+}
   };
 
   return (
@@ -330,7 +333,6 @@ const UploadDatasetForm = ({ onUploadSuccess }) => {
   );
 };
 
-/* --- FORM COMPONENT: EDIT PROFILE --- */
 const EditDoctorProfile = ({ initialData, onUpdate }) => {
   const [formData, setFormData] = useState(initialData);
   const [saving, setSaving] = useState(false);

@@ -5,7 +5,6 @@ const Chat = require('../models/Chat');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
 
-// GET: Load chat history for the logged-in user
 router.get("/history", protect, async (req, res) => {
   try {
     const chat = await Chat.findOne({ userId: req.user.id });
@@ -15,13 +14,11 @@ router.get("/history", protect, async (req, res) => {
   }
 });
 
-// POST: Send message and save to history
 router.post("/chat", protect, async (req, res) => {
   const { userMessage } = req.body;
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
   try {
-    // 1. Get AI Response from Gemini
     const response = await axios.post(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
@@ -34,7 +31,6 @@ router.post("/chat", protect, async (req, res) => {
 
     const botReply = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "I'm offline.";
 
-    // 2. Save both messages to MongoDB
     let chat = await Chat.findOne({ userId: req.user.id });
     
     if (!chat) {

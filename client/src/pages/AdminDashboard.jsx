@@ -25,7 +25,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      {/* SIDEBAR */}
+     
       <div className="w-64 bg-slate-900 text-white flex flex-col sticky top-0 h-screen">
         <div className="p-6 text-2xl font-bold border-b border-slate-800 text-indigo-400">
           Sumtasina Admin
@@ -67,7 +67,7 @@ const AdminDashboard = () => {
             <BookOpen size={20} /> Create Article
           </button>
 
-          {/* Dataset Sidebar Button */}
+   
           <button
             onClick={() => setActiveTab("dataset")}
             className={`w-full flex items-center gap-3 p-3 rounded-lg transition ${
@@ -86,20 +86,18 @@ const AdminDashboard = () => {
         </button>
       </div>
 
-      {/* MAIN CONTENT AREA */}
+     
       <div className="flex-1 p-8 overflow-y-auto">
         {activeTab === "overview" && <OverviewStats />}
         {activeTab === "appointments" && <AdminAppointmentManager />}
         {activeTab === "doctor" && <AddDoctorForm />}
         {activeTab === "article" && <AddArticleForm />}
-        {/* dataset View Added Here */}
         {activeTab === "dataset" && <AdminDatasetManager />}
       </div>
     </div>
   );
 };
 
-// --- SUB-COMPONENT: OVERVIEW STATS ---
 const OverviewStats = () => (
   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
     <div className="bg-white p-6 rounded-2xl shadow-sm border-t-4 border-indigo-500">
@@ -117,7 +115,6 @@ const OverviewStats = () => (
   </div>
 );
 
-// --- SUB-COMPONENT: ADMIN APPOINTMENT MANAGER ---
 const AdminAppointmentManager = () => {
   const [appointments, setAppointments] = useState([]);
   const [meetingLinks, setMeetingLinks] = useState({});
@@ -225,7 +222,6 @@ const AdminAppointmentManager = () => {
   );
 };
 
-// --- SUB-COMPONENT: ADMIN DATASET MANAGER ---
 const AdminDatasetManager = () => {
   const [dataset, setdataset] = useState([]);
 
@@ -299,7 +295,6 @@ const AdminDatasetManager = () => {
   );
 };
 
-// --- SUB-COMPONENT: ADD DOCTOR FORM ---
 const AddDoctorForm = () => {
   const [docData, setDocData] = useState({
     name: "",
@@ -427,8 +422,6 @@ const AddDoctorForm = () => {
   );
 };
 
-// --- SUB-COMPONENT: ADD ARTICLE FORM ---
-// --- SUB-COMPONENT: ADD ARTICLE FORM ---
 const AddArticleForm = () => {
   const [article, setArticle] = useState({
     title: "",
@@ -441,7 +434,6 @@ const AddArticleForm = () => {
   });
   const [loading, setLoading] = useState(false);
 
-  // Helper to handle all input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setArticle((prev) => ({ ...prev, [name]: value }));
@@ -480,7 +472,6 @@ const AddArticleForm = () => {
         Create Health Article
       </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Row 1: Title and Disease Name */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <input
             name="title"
@@ -500,7 +491,6 @@ const AddArticleForm = () => {
           />
         </div>
 
-        {/* Row 2: Image URL */}
         <input
           name="imageUrl"
           value={article.imageUrl}
@@ -520,7 +510,6 @@ const AddArticleForm = () => {
           required
         />
 
-        {/* Row 4: Symptoms, Prevention, Treatments */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <textarea
             name="symptoms"
@@ -548,7 +537,6 @@ const AddArticleForm = () => {
           />
         </div>
 
-        {/* Submit Button */}
         <button
           type="submit"
           disabled={loading}

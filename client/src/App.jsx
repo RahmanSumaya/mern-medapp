@@ -17,16 +17,14 @@ import DoctorPatientView from './pages/DoctorPatientView';
 import PatientRecords from './pages/PatientRecords';
 import AboutUs from './pages/Aboutus';
 
-// --- PROTECTED ROUTE COMPONENT ---
 const ProtectedRoute = ({ children, allowedRole }) => {
   const token = localStorage.getItem('token');
-  const userRole = localStorage.getItem('role'); // Get role saved during login
+  const userRole = localStorage.getItem('role'); 
 
   if (!token) {
     return <Navigate to="/login" />;
   }
 
-  // If a specific role is required and user doesn't have it, send them home
   if (allowedRole && userRole !== allowedRole) {
     return <Navigate to="/" />;
   }
@@ -38,7 +36,6 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} /> 
@@ -52,7 +49,6 @@ function App() {
         <Route path="/patientRecords" element={<PatientRecords/>} />
         <Route path="/book-appointment/:doctorId" element={<BookAppointment />} />
         <Route path="/about" element={<AboutUs />} />
-        {/* Patient Only Routes */}
         <Route 
           path="/dashboard" 
           element={
@@ -69,7 +65,6 @@ function App() {
             </ProtectedRoute>
           } 
         />
-        {/* Doctor Only Routes */}
         <Route 
           path="/dashboard_doctor" 
           element={
@@ -79,7 +74,6 @@ function App() {
           } 
         />
 
-        {/* Admin Only Routes */}
         <Route 
           path="/admin-dashboard" 
           element={
@@ -88,8 +82,6 @@ function App() {
             </ProtectedRoute>
           } 
         />
-
-        {/* Fallback */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>

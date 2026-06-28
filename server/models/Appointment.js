@@ -1,4 +1,3 @@
-// models/appointment.js
 const mongoose = require('mongoose');
 
 const appointmentSchema = new mongoose.Schema({
@@ -15,7 +14,7 @@ const appointmentSchema = new mongoose.Schema({
     transactionId: String,
     isPaid: { type: Boolean, default: false }
   },
-  meetingLink: { type: String, default: "" } // NEW FIELD ADDED
+  meetingLink: { type: String, default: "" } 
 }, { timestamps: true });
 
 module.exports = mongoose.model('Appointment', appointmentSchema);

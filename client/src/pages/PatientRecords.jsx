@@ -36,7 +36,7 @@ const PatientRecords = () => {
     <div className="p-10 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">My Medical Medical Vault</h1>
       
-      {/* Upload Section */}
+      
       <form onSubmit={handleUpload} className="bg-white p-6 rounded-2xl shadow-sm border mb-8">
         <div className="flex flex-col gap-4">
           <input type="file" onChange={(e) => setFile(e.target.files[0])} className="border p-2 rounded-lg" />
@@ -47,7 +47,7 @@ const PatientRecords = () => {
         </div>
       </form>
 
-      {/* Record List */}
+
       <div className="grid grid-cols-1 gap-4">
         {records.map(rec => (
           <div key={rec._id} className="flex justify-between items-center p-4 bg-slate-50 rounded-xl border">

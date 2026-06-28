@@ -11,7 +11,6 @@ const Chatbot = () => {
   
   const token = localStorage.getItem('token');
 
-  // Load history when opening chat
   useEffect(() => {
     if (isOpen && token) {
       const fetchHistory = async () => {
@@ -53,7 +52,6 @@ const Chatbot = () => {
     }
   };
 
-  // If no token, don't show the chatbot at all
   if (!token) return null;
 
   return (

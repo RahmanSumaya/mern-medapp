@@ -1,23 +1,22 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs'); // Or 'bcrypt' depending on what you installed
+const bcrypt = require('bcryptjs');
 
 const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  gender: { type: String }, // Add this
-  dob: { type: Date },      // Add this
+  gender: { type: String }, 
+  dob: { type: Date },      
   role: { 
     type: String, 
     enum: ['user', 'admin', 'doctor'], 
     default: 'user' 
   },
-  // --- New Doctor Specific Fields ---
-  specialization: { type: String }, // e.g., Neurologist
+  specialization: { type: String }, 
   address: { type: String },
   phone: { type: String },
   hourlyRate: { type: Number },
-  // Add these to your UserSchema in models/User.js
+  
   experience: { type: Number, default: 0 }, 
   hospitalName: { type: String },
   about: { type: String },
@@ -27,16 +26,13 @@ const UserSchema = new mongoose.Schema({
     enum: ['available', 'unavailable'], 
     default: 'available' 
   },
-  // Add this inside your UserSchema
 profilePic: { 
   type: String, 
-  default: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' // Default avatar link
+  default: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' 
 },
   createdAt: { type: Date, default: Date.now }
 });
-// Add this helper method to the Schema
 UserSchema.methods.matchPassword = async function (enteredPassword) {
-  // this.password refers to the hashed password in the database
   return await bcrypt.compare(enteredPassword, this.password);
 };
 UserSchema.pre('save', async function (next) {
